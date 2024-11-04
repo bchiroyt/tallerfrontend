@@ -1,0 +1,197 @@
+.accesorio-detalles-container {
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.primeroac{
+  height: 75px;
+}
+.volver-btn {
+  background-color: #33a5f1;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  margin-bottom: 20px;
+}
+
+.volver-btn:hover {
+  background-color: #0099cc;
+}
+
+.accesorio-detalles-content {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 30px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.accesorio-imagen {
+  width: 40%;
+  max-width: 400px;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.accesorio-info {
+  flex: 1;
+}
+
+.accesorio-info h1 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+.accesorio-datos p {
+  margin-bottom: 10px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.accesorio-datos strong {
+  font-weight: bold;
+  color: #555;
+}
+
+.acciones-container {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+.accion-icon {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.accion-icon:hover {
+  transform: scale(1.1);
+}
+
+.estado-toggle {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.estado-toggle.activo {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.estado-toggle.inactivo {
+  background-color: #f44336;
+  color: white;
+}
+
+.estado-activo {
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+.estado-inactivo {
+  color: #f44336;
+  font-weight: bold;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+form input,
+form select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+form button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 16px;
+}
+
+form button[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+}
+
+form button[type="button"] {
+  background-color: #f44336;
+  color: white;
+}
+
+.modal-confirmacion {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-confirmacion .modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.modal-confirmacion .modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-confirmacion button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.modal-confirmacion button:first-child {
+  background-color: #f44336;
+  color: white;
+}
+
+.modal-confirmacion button:last-child {
+  background-color: #ccc;
+  color: black;
+}
+
+@media (max-width: 768px) {
+  .accesorio-detalles-content {
+    flex-direction: column;
+  }
+
+  .accesorio-imagen {
+    width: 100%;
+    max-width: none;
+  }
+}

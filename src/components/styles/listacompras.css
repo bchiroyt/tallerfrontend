@@ -1,0 +1,62 @@
+.compras-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.licom{
+  height: 70px;
+}
+
+.compras-title {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.compras-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.compras-button:hover {
+  background-color: #45a049;
+}
+
+.compras-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.compras-table th,
+.compras-table td {
+  border: 1px solid #ddd;
+  color: #333;
+  padding: 12px;
+  text-align: left;
+}
+
+.compras-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.compras-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.budet {
+  color: white;
+  text-decoration: none;
+  background-color: #008CBA;
+}
+
+.budet:hover {
+  text-decoration: underline;
+}

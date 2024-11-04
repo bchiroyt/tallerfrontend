@@ -1,0 +1,150 @@
+.primero {
+  height: 70px;
+}
+
+.usuario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #d1d1d1;
+  height: 50px;
+}
+
+.nombre-pagina {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.buscar-usuario {
+  width: 40%;
+  padding: 5px;
+}
+
+.nuevo-usuario-btn {
+  background-color: #33a5f1;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.nuevo-usuario-btn:hover {
+  background-color: #0099cc;
+}
+
+.segundo-usu {
+  width: 96%;
+  margin-left: 2%;
+}
+
+.tabla-usuarios {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+
+.tabla-usuarios th,
+.tabla-usuarios td {
+  padding: 5px;
+  text-align: left;
+  border: 1px solid #c4c4c4;
+}
+
+.tabla-usuarios th {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.estado.activo {
+  color: rgb(6, 236, 6);
+}
+
+.estado.inactivo {
+  color: red;
+}
+
+.modal1 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  width: 400px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cancelar-btn,
+.guardar-btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cancelar-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.guardar-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.accion-icon {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+/* Estilos adicionales para el formulario en el modal */
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-content input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .usuario-header {
+    flex-direction: column;
+    height: auto;
+    gap: 10px;
+  }
+
+  .buscar-usuario,
+  .nuevo-usuario-btn {
+    width: 100%;
+  }
+
+  .tabla-usuarios {
+    font-size: 14px;
+  }
+}
+

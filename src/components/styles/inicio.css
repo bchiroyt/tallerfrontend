@@ -1,0 +1,53 @@
+/* Asegura que todo el cuerpo de la página no tenga margen ni padding */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.cont {
+  height: 100vh; /* Ocupa toda la altura de la pantalla */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+}
+
+.inicio-container {
+  position: relative;
+  height: 100%;
+  width: 70%;
+  overflow: hidden;
+}
+
+.inicio-container img.logobici {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ajusta la imagen para cubrir todo el contenedor sin distorsionar */
+  z-index: 1;
+}
+
+.inicio-container h2,
+.inicio-container p {
+  position: absolute;
+  z-index: 2;
+  color: #ffffff;
+  text-align: center;
+  width: 100%;
+}
+
+.inicio-container h2 {
+  top: 0%;
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.inicio-container p {
+  top: 83%;
+  font-size: 24px;
+}

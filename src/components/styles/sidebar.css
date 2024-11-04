@@ -1,0 +1,118 @@
+/* Estilos generales para la barra lateral */
+.mod{
+  text-align: center;
+  font-weight: bold;
+}
+.sidebar {
+  position: fixed;
+  top: 0; /* Ajustado según la altura del Header */
+  left: 0;
+  width: 230px;
+  height: 100vh; /* Ocupa toda la altura */
+  overflow: auto;
+  background-color: #333;
+  transition: transform 0.3s ease; /* Transición más fluida */
+  transform: translateX(-100%); /* Oculto por defecto */
+  z-index: 100;
+}
+
+.sidebar.visible {
+  transform: translateX(0); /* Visible cuando el sidebar está activado */
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+.sidebar ul li {
+  padding: 15px 20px;
+  color: #ffffff;
+  font-size: 16px;
+  position: relative;
+  cursor: pointer;
+}
+
+
+.sidebar ul li a {
+  color: #ffffff;
+  text-decoration: none;
+  display: block;
+  width: 100%;
+}
+
+
+
+.submenu {
+  display: none;
+  background-color: #302f2f;
+}
+
+.sidebar ul li:hover .submenu {
+  display: block;
+}
+
+.submenu li {
+  padding: 10px 0;
+  font-size: 14px;
+}
+
+.submenu li a {
+  color: #cccccc;
+}
+
+.submenu li:hover a {
+  color: #ffffff;
+  background-color: #0e2a44;
+}
+
+
+
+/* Estilos responsive */
+@media screen and (max-width: 768px) {
+  .sidebar {
+    width: 200px; /* Reduce el ancho para pantallas medianas */
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .sidebar {
+    width: 100%; /* Ocupa todo el ancho en pantallas pequeñas */
+    height: 100%; /* Ocupa toda la altura */
+    transform: translateX(-100%); /* Oculta por defecto en pantallas pequeñas */
+  }
+
+  .sidebar.visible {
+    transform: translateX(0); /* Muestra la barra lateral en móviles cuando es visible */
+  }
+
+  .sidebar ul li {
+    padding: 12px 15px; /* Ajusta el padding para pantallas más pequeñas */
+    font-size: 14px; /* Reduce el tamaño de fuente */
+  }
+
+  .submenu li {
+    padding: 8px 0; /* Ajusta el padding de los submenús */
+    font-size: 12px; /* Reduce el tamaño de fuente de los submenús */
+  }
+}
+
+/* Estilos para un botón de menú en dispositivos móviles */
+.menu-toggle {
+  display: none;
+}
+
+@media screen and (max-width: 480px) {
+  .menu-toggle {
+    display: block;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1100;  /*Asegura que esté por encima del sidebar */
+  }
+}

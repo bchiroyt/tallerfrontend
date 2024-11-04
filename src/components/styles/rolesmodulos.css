@@ -1,0 +1,188 @@
+.primerorol {
+  height: 50px;
+}
+
+.roles-modulos-permisos-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.section {
+  margin-bottom: 30px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.section h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #444;
+}
+
+.crear-btn {
+  padding: 10px 15px;
+  background-color: #33a5f1;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-bottom: 20px;
+}
+
+.crear-btn:hover {
+  background-color: #0099cc;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.data-table th {
+  background-color: #fdfdfd00;
+  font-weight: bold;
+  color: #333;
+}
+
+.data-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+.data-table button [type="button"] {
+  background-color: #f44336;
+  color: white;
+}
+
+.data-table button [type="button"],
+.modal-buttons button:last-child {
+    background-color: #4caf50;
+    color: white;
+  }
+.data-table button:hover {
+  background-color: #0099cc;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+}
+.permisos-modal {
+  background-color: rgb(255, 255, 255);
+  padding: 20px;
+  border-radius: 8px;
+  width: 500px;
+}
+.modal-content h2 {
+  margin-bottom: 15px;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content input {
+  margin-bottom: 10px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.modal-buttons button {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.modal-buttons button[type="button"] {
+  background-color: #f44336;
+  color: white;
+}
+
+.modal-buttons button[type="submit"],
+.modal-buttons button:last-child {
+  background-color: #4caf50;
+  color: white;
+}
+
+.modal-buttons button:hover {
+  opacity: 0.8;
+}
+
+.permisos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.permiso-item {
+  display: flex;
+  align-items: center;
+}
+
+.permiso-item label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.permiso-item input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+@media (max-width: 768px) {
+  .data-table {
+    font-size: 14px;
+  }
+
+  .data-table button {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .modal-content {
+    width: 90%;
+    max-width: 300px;
+  }
+}

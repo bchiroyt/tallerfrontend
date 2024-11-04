@@ -1,0 +1,149 @@
+.primero{
+  height: 70px;
+}
+.cat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 35px;
+    background-color: #d1d1d1;
+    height: 50px;
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.nombre-pagina {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.buscar-categoria {
+    width: 40%;
+    padding: 5px;
+}
+
+.nueva-categoria-btn {
+    background-color: #33a5f1;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.nueva-categoria-btn:hover {
+    background-color: #0099cc;
+}
+
+.segundo{
+    width: 90%;
+    margin-left: 5%;
+}
+.tabla-categorias {
+    width: 100%;
+}
+
+.tabla-categorias th,
+.tabla-categorias td {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #c4c4c4;
+}
+
+.tabla-categorias th {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.estado.activo {
+    color: rgb(6, 236, 6);
+}
+
+.estado.inactivo {
+    color: red;
+}
+
+.accion-icon {
+    width: 26px;
+    height: 24px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 400px;
+    max-width: 90%;
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-content input,
+.modal-content textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.cancelar-btn,
+.guardar-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.cancelar-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.guardar-btn {
+    background-color: #4caf50;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .categoria-header {
+        flex-direction: column;
+        height: auto;
+        gap: 10px;
+    }
+
+    .buscar-categoria {
+        width: 100%;
+    }
+
+    .nueva-categoria-btn {
+        width: 100%;
+    }
+}
