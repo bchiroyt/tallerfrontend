@@ -59,9 +59,10 @@ function Sidebar({ visible }) {
           <li>
             <a href="#">Ventas</a>
             <ul className="submenu">
-              <li><a href="./NuevaVenta">Venta</a></li>
+              <li><a href="./GestionCaja">Caja</a></li>
+              <li><a href="./Ventas">Venta</a></li>
               <li><a href="./Clientes">Cliente</a></li>
-              <li><a href="#">Devoluciones</a></li>
+              <li><a href="./Reembolsos">Devoluciones</a></li>
             </ul>
           </li>
         )}
@@ -99,7 +100,7 @@ function Sidebar({ visible }) {
             <a href="#">Servicios</a>
             <ul className="submenu">
               <li><a href="./Citas">Citas</a></li>
-              <li><a href="./Historial">Historial</a></li>
+              <li><a href="./Servicio">Servicio</a></li>
             </ul>
           </li>
         )}

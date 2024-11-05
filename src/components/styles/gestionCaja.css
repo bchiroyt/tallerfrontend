@@ -1,0 +1,47 @@
+.gesca{
+  height: 50px;
+}
+
+.gestion-caja-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.abrir-caja,
+.cerrar-caja {
+  margin-bottom: 20px;
+}
+
+.monto-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.abrir-btn,
+.cerrar-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.historial-cajas table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.historial-cajas th,
+.historial-cajas td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.historial-cajas th {
+  background-color: #f2f2f2;
+}

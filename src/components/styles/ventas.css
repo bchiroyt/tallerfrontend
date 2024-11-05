@@ -1,0 +1,125 @@
+.vent{
+  height: 40px;
+}
+
+.ventas-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.busqueda-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.codigo-barra-input,
+.busqueda-input {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+}
+
+.buscar-btn {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.cliente-container {
+  margin-bottom: 20px;
+}
+
+.nit-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+}
+
+.cliente-info {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.carrito-container {
+  margin-bottom: 20px;
+}
+
+.carrito-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #f0f0f0;
+}
+
+.item-imagen {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+}
+
+.item-nombre {
+  flex: 1;
+}
+
+.item-cantidad {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.item-cantidad button {
+  padding: 5px 10px;
+  background-color: #ddd;
+  border: none;
+  cursor: pointer;
+}
+
+.item-subtotal {
+  font-weight: bold;
+}
+
+.eliminar-btn {
+  padding: 5px 10px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.total {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.pago-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.monto-input {
+  padding: 10px;
+  font-size: 16px;
+}
+
+.cambio {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.realizar-venta-btn {
+  padding: 10px 20px;
+  font-size: 18px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+

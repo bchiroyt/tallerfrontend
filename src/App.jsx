@@ -18,11 +18,10 @@ import NuevaCompra from "./components/Pages/NuevaCompra";
 import DetalleCompra from "./components/Pages/DetalleCompra";
 import Clientes from "./components/Pages/Clientes"
 import Citas from "./components/Pages/Citas";
-import Historial from "./components/Pages/Historial"
-import ListaVentas from "./components/Pages/ListaVentas";
-import NuevaVenta from "./components/Pages/NuevaVenta";
-import DetalleVenta from "./components/Pages/DetalleVenta";
-
+import Servicio from "./components/Pages/Servicio";
+import GestionCaja from "./components/Pages/GestionCaja";
+import Ventas from "./components/Pages/Ventas";
+import Reembolsos from "./components/Pages/Reembolsos"
 
 function App() {
   return (
@@ -193,45 +192,45 @@ function App() {
           }
         />
         <Route
-          path="/historial"
+          path="/Servicio"
           element={
             <PrivateRoute>
               <MainLayout>
-                <Historial />
+                <Servicio />
               </MainLayout>
             </PrivateRoute>
           }
         />
         <Route
-          path="/nuevaventa" 
+          path="/GestionCaja"
           element={
             <PrivateRoute>
               <MainLayout>
-                <NuevaVenta />
+                <GestionCaja />
               </MainLayout>
             </PrivateRoute>
           }
-        /> 
+        />
         <Route
           path="/ventas"
           element={
             <PrivateRoute>
               <MainLayout>
-                <ListaVentas />
+                <Ventas />
               </MainLayout>
             </PrivateRoute>
           }
-        />         
+        />
         <Route
-          path="/ventas/:id"
+          path="/reembolsos"
           element={
             <PrivateRoute>
               <MainLayout>
-                <DetalleVenta />
+                <Reembolsos />
               </MainLayout>
             </PrivateRoute>
           }
-        />  
+        />
       </Routes>
     </BrowserRouter>
   );
