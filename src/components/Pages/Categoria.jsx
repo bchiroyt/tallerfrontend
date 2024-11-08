@@ -121,6 +121,7 @@ function Categoria() {
             nombre_categoria: "",
             descripcion: "",
         });
+        setModoEditar(false);
     };
 
     const buscarCategorias = (e) => {

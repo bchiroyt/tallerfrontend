@@ -1,8 +1,23 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { jsPDF } from "jspdf";
-import '../styles/nuevacompra.css';
+import { 
+  FaStore,
+  FaCalendarAlt,
+  FaListAlt,
+  FaBarcode,
+  FaBox,
+  FaSearch,
+  FaPlus,
+  FaTrash,
+  FaSave,
+  FaTimes,
+  FaReceipt,
+  FaFileInvoice,
+  FaMoneyBillWave  
+} from 'react-icons/fa';
+import styles from '../styles/nuevacompra.module.css';
+
 
 const URL = import.meta.env.VITE_URL;
 
@@ -156,26 +171,13 @@ export default function NuevaCompra() {
     return compra.detalles.reduce((total, detalle) => total + detalle.subtotal, 0);
   };
 
-  const generarPDF = () => {
-    const doc = new jsPDF();
-    doc.text('Detalle de Compra', 20, 20);
-    doc.text(`Proveedor: ${proveedores.find(p => p.id_proveedor === compra.id_proveedor)?.nombre_compañia}`, 20, 30);
-    doc.text(`Fecha: ${compra.fecha_facturacion}`, 20, 40);
-    doc.text(`Tipo de Comprobante: ${compra.tipo_comprobante}`, 20, 50);
-    doc.text(`Serie: ${compra.serie}`, 20, 60);
-
-    let y = 80;
-    compra.detalles.forEach((detalle, index) => {
-      doc.text(`${index + 1}. ${detalle.nombre} - Cantidad: ${detalle.cantidad} - Precio: Q${detalle.precio_unitario} - Subtotal: Q${detalle.subtotal}`, 20, y);
-      y += 10;
-    });
-
-    doc.text(`Total: Q${calcularTotal().toFixed(2)}`, 20, y + 10);
-    doc.save('detalle_compra.pdf');
-  };
-
   const guardarCompra = async () => {
     try {
+      if (!compra.id_proveedor || !compra.tipo_comprobante || !compra.serie || compra.detalles.length === 0) {
+        alert('Por favor complete todos los campos requeridos');
+        return;
+      }
+  
       const token = localStorage.getItem('token');
       const response = await axios.post(`${URL}/compras`, compra, {
         headers: {
@@ -183,240 +185,311 @@ export default function NuevaCompra() {
           'Content-Type': 'application/json'
         }
       });
-
+  
       if (response.data.ok) {
-        alert('Compra guardada exitosamente');
-        // Redirigir al detalle de la compra recién creada
-        navigate(`/DetalleCompra/${response.data.compra.id_compra}`);
+        // Abrir el PDF en una nueva ventana
+        const pdfUrl = `${URL}${response.data.compra.pdf}`;
+        window.open(pdfUrl, '_blank');
+        
+        alert('Compra registrada exitosamente');
+        navigate('/ListaCompra');
       }
     } catch (error) {
       console.error('Error al guardar la compra:', error);
       alert(error.response?.data?.msg || 'Error al guardar la compra');
     }
   };
-
   const cancelarCompra = () => {
-    if (window.confirm('¿Está seguro de cancelar la compra? Se perderán todos los datos.')) {
-      navigate('/ListaCompra');
-    }
+    // Resetear el formulario
+    setCompra({
+      id_proveedor: '',
+      tipo_comprobante: 'Factura',
+      serie: '',
+      fecha_facturacion: new Date().toISOString().split('T')[0],
+      detalles: []
+    });
+  
+    // Resetear el producto actual
+    setProductoActual({
+      tipo_producto: 'accesorio',
+      id_producto: '',
+      cantidad: 1,
+      precio_unitario: 0,
+      precio_venta: 0,
+      nombre: '',
+      seleccionado: false
+    });
+  
+    // Limpiar búsqueda
+    setBusqueda('');
+    setResultadosBusqueda([]);
+  
+    // Opcional: redirigir a la lista de compras
+    navigate('/ListaCompra');
   };
 
   return (
     <div>
-      <div className='necom'></div> 
-    <div className="compras-container">
-      <h1 className="compras-title">Nueva Compra</h1>
-      <form className="compras-form">
-        <div className="compras-form-group">
-          <label className="compras-label" htmlFor="id_proveedor">Proveedor</label>
-          <select
-            className="compras-select"
-            id="id_proveedor"
-            name="id_proveedor"
-            value={compra.id_proveedor}
-            onChange={handleInputChange}
-            required
-          >
-            <option value="">Seleccione un proveedor</option>
-            {proveedores.map(proveedor => (
-              <option 
-                key={`prov-${proveedor.id_proveedor}`} 
-                value={proveedor.id_proveedor}
-              >
-                {proveedor.nombre_compañia}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="compras-form-group">
-          <label className="compras-label" htmlFor="tipo_comprobante">Tipo de Comprobante</label>
-          <select
-            className="compras-select"
-            id="tipo_comprobante"
-            name="tipo_comprobante"
-            value={compra.tipo_comprobante}
-            onChange={handleInputChange}
-            required
-          >
-            <option value="Factura">Factura</option>
-            <option value="Boleta">Boleta</option>
-            <option value="Recibo">Recibo</option>
-          </select>
-        </div>
-        <div className="compras-form-group">
-          <label className="compras-label" htmlFor="serie">Serie</label>
-          <input
-            className="compras-input"
-            id="serie"
-            type="text"
-            name="serie"
-            value={compra.serie}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div className="compras-form-group">
-          <label className="compras-label" htmlFor="fecha_facturacion">Fecha de Facturación</label>
-          <input
-            className="compras-input"
-            id="fecha_facturacion"
-            type="date"
-            name="fecha_facturacion"
-            value={compra.fecha_facturacion}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-
-        <h2 className="compras-subtitle">Agregar Producto</h2>
-        <div className="compras-form-group">
-          <label className="compras-label" htmlFor="tipo_producto">Tipo de Producto</label>
-          <select
-            className="compras-select"
-            id="tipo_producto"
-            name="tipo_producto"
-            value={productoActual.tipo_producto}
-            onChange={handleProductoChange}
-          >
-            <option value="accesorio">Accesorio</option>
-            <option value="bicicleta">Bicicleta</option>
-            <option value="producto">Producto</option>
-          </select>
-        </div>
-        <div className="compras-form-group">
-          <input
-            className="compras-input"
-            type="text"
-            placeholder="Buscar producto por nombre o código"
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-          />
-        </div>
-        {resultadosBusqueda.length > 0 && (
-          <ul className="compras-search-results">
-            {resultadosBusqueda.map((producto, index) => (
-              <li 
-                key={`search-${producto.id_producto || producto.id || index}`}
-                className="compras-search-item"
-                onClick={() => seleccionarProducto(producto)}
-                style={{ cursor: 'pointer' }}
-              >
-                <div className="compras-search-item-name">{producto.nombre}</div>
-                <div className="compras-search-item-details">
-                  Código: {producto.codigo || producto.codigo_barra || 'N/A'} - 
-                  Precio: Q{Number(producto.precio_venta || 0).toFixed(2)}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-        <div className="compras-form-group">
-          <label className="compras-label" htmlFor="cantidad">Cantidad</label>
-          <input
-            className="compras-input"
-            id="cantidad"
-            type="number"
-            name="cantidad"
-            value={productoActual.cantidad}
-            onChange={handleProductoChange}
-            min="1"
-          />
-        </div>
-        <div className="compras-form-group">
-          <label className="compras-label" htmlFor="precio_unitario">Precio de Costo</label>
-          <input
-            className="compras-input"
-            id="precio_unitario"
-            type="number"
-            name="precio_unitario"
-            value={productoActual.precio_unitario}
-            onChange={handleProductoChange}
-            min="0"
-            step="0.01"
-          />
-        </div>
-        <div className="compras-form-group">
-          <label className="compras-label" htmlFor="precio_venta">Precio de Venta</label>
-          <input
-            className="compras-input"
-            id="precio_venta"
-            type="number"
-            name="precio_venta"
-            value={productoActual.precio_venta}
-            onChange={handleProductoChange}
-            min="0"
-            step="0.01"
-          />
-        </div>
-        <button
-          className="compras-button"
-          type="button"
-          onClick={agregarDetalle}
-        >
-          Agregar a la compra
-        </button>
-
-        <h2 className="compras-subtitle">Detalles de la Compra</h2>
-        <table className="compras-table">
-          <thead>
-            <tr>
-              <th>Tipo</th>
-              <th>Producto</th>
-              <th>Cantidad</th>
-              <th>Precio de Costo</th>
-              <th>Precio de Venta</th>
-              <th>Subtotal</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {compra.detalles.map((detalle, index) => (
-              <tr key={`detail-${detalle.id_producto}-${index}`}>
-                <td>{detalle.tipo_producto}</td>
-                <td>{detalle.nombre}</td>
-                <td>{detalle.cantidad}</td>
-                <td>Q{Number(detalle.precio_unitario).toFixed(2)}</td>
-                <td>Q{Number(detalle.precio_venta).toFixed(2)}</td>
-                <td>Q{Number(detalle.subtotal).toFixed(2)}</td>
-                <td>
-                  <button
-                    className="compras-button compras-button-delete"
-                    type="button"
-                    onClick={() => eliminarDetalle(index)}
+      <div className={styles.necom}></div> 
+      <div className={styles.comprasContainer}>
+        <h1 className={styles.comprasTitle}>
+          <FaFileInvoice className={styles.titleIcon} />
+          Nueva Compra
+        </h1>
+        
+        <form className={styles.comprasForm}>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              <FaStore className={styles.labelIcon} />
+              Proveedor
+            </label>
+            <select
+              className={styles.select}
+              name="id_proveedor"
+              value={compra.id_proveedor}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">Seleccione un proveedor</option>
+              {proveedores.map(proveedor => (
+                <option key={`prov-${proveedor.id_proveedor}`} value={proveedor.id_proveedor}>
+                  {proveedor.nombre_compañia}
+                </option>
+              ))}
+            </select>
+          </div>
+  
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              <FaReceipt className={styles.labelIcon} />
+              Tipo de Comprobante
+            </label>
+            <select
+              className={styles.select}
+              name="tipo_comprobante"
+              value={compra.tipo_comprobante}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="Factura">Factura</option>
+              <option value="Boleta">Boleta</option>
+              <option value="Recibo">Recibo</option>
+            </select>
+          </div>
+  
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              <FaBarcode className={styles.labelIcon} />
+              Serie
+            </label>
+            <input
+              className={styles.input}
+              type="text"
+              name="serie"
+              value={compra.serie}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+  
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              <FaCalendarAlt className={styles.labelIcon} />
+              Fecha de Facturación
+            </label>
+            <input
+              className={styles.input}
+              type="date"
+              name="fecha_facturacion"
+              value={compra.fecha_facturacion}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+  
+          <h2 className={styles.subtitle}>
+            <FaPlus className={styles.subtitleIcon} />
+            Agregar Producto
+          </h2>
+  
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              <FaBox className={styles.labelIcon} />
+              Tipo de Producto
+            </label>
+            <select
+              className={styles.select}
+              name="tipo_producto"
+              value={productoActual.tipo_producto}
+              onChange={handleProductoChange}
+            >
+              <option value="accesorio">Accesorio</option>
+              <option value="bicicleta">Bicicleta</option>
+              <option value="producto">Producto</option>
+            </select>
+          </div>
+  
+          <div className={styles.searchGroup}>
+            <div className={styles.searchInput}>
+              <FaSearch className={styles.searchIcon} />
+              <input
+                className={styles.input}
+                type="text"
+                placeholder="Buscar producto por nombre o código"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+              />
+            </div>
+            {resultadosBusqueda.length > 0 && (
+              <ul className={styles.searchResults}>
+                {resultadosBusqueda.map((producto, index) => (
+                  <li 
+                    key={`search-${producto.id_producto || producto.id || index}`}
+                    className={styles.searchItem}
+                    onClick={() => seleccionarProducto(producto)}
                   >
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colSpan="5" className="compras-total-label">Total:</td>
-              <td className="compras-total-amount">Q{calcularTotal().toFixed(2)}</td>
-              <td></td>
-            </tr>
-          </tfoot>
-        </table>
+                    <div className={styles.searchItemName}>{producto.nombre}</div>
+                    <div className={styles.searchItemDetails}>
+                      <FaBarcode className={styles.detailIcon} />
+                      {producto.codigo || producto.codigo_barra || 'N/A'} - 
+                      <FaMoneyBillWave className={styles.detailIcon} />
+                      Q{Number(producto.precio_venta || 0).toFixed(2)}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+  
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              <FaBox className={styles.labelIcon} />
+              Cantidad
+            </label>
+            <input
+              className={styles.input}
+              type="number"
+              name="cantidad"
+              value={productoActual.cantidad}
+              onChange={handleProductoChange}
+              min="1"
+            />
+          </div>
+  
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              <FaMoneyBillWave className={styles.labelIcon} />
+              Precio de Costo
+            </label>
 
-        <div className="compras-form-actions">
-      <button
-        className="compras-button compras-button-cancel"
-        type="button"
-        onClick={cancelarCompra}
-      >
-        Cancelar Compra
-      </button>
-      <button
-        className="compras-button compras-button-save"
-        type="button"
-        onClick={guardarCompra}
-      >
-        Guardar Compra
-      </button>
-    </div>
-      </form>
-    </div>
+            <input
+              className={styles.input}
+              type="number"
+              name="precio_unitario"
+              value={productoActual.precio_unitario}
+              onChange={handleProductoChange}
+              min="0"
+              step="0.01"
+            />
+          </div>
+  
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              Q
+              Precio de Venta
+            </label>
+            <input
+              className={styles.input}
+              type="number"
+              name="precio_venta"
+              value={productoActual.precio_venta}
+              onChange={handleProductoChange}
+              min="0"
+              step="0.01"
+            />
+          </div>
+  
+          <button
+            className={styles.addButton}
+            type="button"
+            onClick={agregarDetalle}
+          >
+            <FaPlus className={styles.buttonIcon} />
+            Agregar a la compra
+          </button>
+  
+          <h2 className={styles.subtitle}>
+            <FaListAlt className={styles.subtitleIcon} />
+            Detalles de la Compra
+          </h2>
+  
+          <div className={styles.tableWrapper}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>Precio de Costo</th>
+                  <th>Precio de Venta</th>
+                  <th>Subtotal</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {compra.detalles.map((detalle, index) => (
+                  <tr key={`detail-${detalle.id_producto}-${index}`}>
+                    <td>{detalle.tipo_producto}</td>
+                    <td>{detalle.nombre}</td>
+                    <td>{detalle.cantidad}</td>
+                    <td>Q{Number(detalle.precio_unitario).toFixed(2)}</td>
+                    <td>Q{Number(detalle.precio_venta).toFixed(2)}</td>
+                    <td>Q{Number(detalle.subtotal).toFixed(2)}</td>
+                    <td>
+                      <button
+                        className={styles.deleteButton}
+                        type="button"
+                        onClick={() => eliminarDetalle(index)}
+                      >
+                        <FaTrash className={styles.buttonIcon} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colSpan="5" className={styles.totalLabel}>Total:</td>
+                  <td className={styles.totalAmount}>
+                    <FaMoneyBillWave className={styles.totalIcon} />
+                    Q{calcularTotal().toFixed(2)}
+                  </td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+  
+          <div className={styles.formActions}>
+            <button
+              className={`${styles.button} ${styles.cancelButton}`}
+              type="button"
+              onClick={cancelarCompra}
+            >
+              <FaTimes className={styles.buttonIcon} />
+              Cancelar Compra
+            </button>
+            <button
+              className={`${styles.button} ${styles.saveButton}`}
+              type="button"
+              onClick={guardarCompra}
+            >
+              <FaSave className={styles.buttonIcon} />
+              Guardar Compra
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

@@ -2,18 +2,26 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate} from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import axios from 'axios';
-import '../styles/ventas.css';
-import { FaSearch, FaBarcode, FaUser, FaShoppingCart, FaPlus, FaMinus, FaTrash, FaMoneyBillWave } from 'react-icons/fa';
+import styles from '../styles/ventas.module.css';
+import { FaSearch, FaShoppingCart, FaPlus, FaMinus, FaTrash, FaMoneyBillWave } from 'react-icons/fa';
 
 export default function Ventas() {
   const navigate = useNavigate();
-  const [productos, setProductos] = useState([]);
   const [carrito, setCarrito] = useState([]);
   const [cliente, setCliente] = useState(null);
   const [busqueda, setBusqueda] = useState('');
   const [montoRecibido, setMontoRecibido] = useState('');
   const [cajaActual, setCajaActual] = useState(null);
+  const [nitBusqueda, setNitBusqueda] = useState('');
+  const [mostrarFormularioCliente, setMostrarFormularioCliente] = useState(false);
+  const [nuevoCliente, setNuevoCliente] = useState({
+    nit: '',
+    nombre: ''    
+  });
+  
   const codigoBarraRef = useRef(null);
+
+  
   const URL = import.meta.env.VITE_URL;
 
   useEffect(() => {
@@ -29,7 +37,7 @@ export default function Ventas() {
       if (response.data.ok) {
         setCajaActual(response.data.caja);
       }
-    } catch (error) {
+    } catch {
       toast.error('No hay una caja abierta');
       // Redirigir a la página de gestión de caja
       navigate('/GestionCaja');
@@ -55,56 +63,61 @@ export default function Ventas() {
     }
   };
 
-  const buscarCliente = async (nit) => {
-    if (!nit) {
-      setCliente(null);
-      return;
-    }
-  
-    try {
-      const response = await axios.get(`${URL}/clientes/nit/${nit}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
-  
-      if (response.data.ok) {
-        setCliente(response.data.cliente);
-      } else {
-        setCliente(null);
-        toast.warn('Cliente no encontrado');
-      }
-    } catch (error) {
-      console.error('Error al buscar cliente:', error);
-      if (error.response?.status === 404) {
-        const confirmar = window.confirm('Cliente no encontrado. ¿Desea registrar un nuevo cliente?');
-        if (confirmar) {
-          const nombre = prompt('Ingrese el nombre del cliente:');
-          if (nombre) {
-            try {
-              const nuevoCliente = await axios.post(`${URL}/clientes`, {
-                nit: nit,
-                nombre: nombre,
-                email: '',
-                direccion: '',
-                telefono: ''
-              }, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-              });
-  
-              if (nuevoCliente.data.ok) {
-                setCliente(nuevoCliente.data.cliente);
-                toast.success('Cliente registrado exitosamente');
-              }
-            } catch (error) {
-              console.error('Error al crear el cliente:', error);
-              toast.error('Error al registrar el cliente');
-            }
-          }
+  const handleBuscarCliente = async (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      
+      try {
+        const response = await axios.get(`${URL}/clientes/nit/${nitBusqueda}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+        
+        if (response.data.ok) {
+          setCliente(response.data.cliente);
+          setMostrarFormularioCliente(false);
+          toast.success('Cliente encontrado');
         }
-      } else {
-        toast.error('Error al buscar el cliente');
+      } catch (error) {
+        if (error.response?.status === 404) {
+          setMostrarFormularioCliente(true);
+          setNuevoCliente(prev => ({ ...prev, nit: nitBusqueda }));
+        } else {
+          toast.error('Error al buscar el cliente');
+        }
       }
     }
   };
+
+  const handleCrearCliente = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(`${URL}/clientes`, {
+        nit: nuevoCliente.nit,
+        nombre: nuevoCliente.nombre,
+        email: '',
+        direccion: '',
+        telefono: ''
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+
+      if (response.data.ok) {
+        setCliente(response.data.cliente);
+        setMostrarFormularioCliente(false);
+        toast.success('Cliente creado exitosamente');
+      }
+    } catch {
+      toast.error('Error al crear el cliente');
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNuevoCliente(prev => ({
+        ...prev,
+        [name]: value
+    }));
+};
 
   const agregarAlCarrito = (producto) => {
     if (producto.tipo_item !== 'servicio' && producto.stock <= 0) {
@@ -258,123 +271,122 @@ export default function Ventas() {
   }
 
   return (
-    <div className="pos-container">
-      <div className='ven'></div>
-      <h1 className="pos-title">Punto de Venta</h1>
+    <div className={styles.posContainer}>
+      <div className={styles.ven}></div>
+      <h1 className={styles.posTitle}>Punto de Venta</h1>
       
-      <div className="pos-layout">
+      <div className={styles.posLayout}>
         {/* Panel Izquierdo */}
-        <div className="pos-left-panel">
-          <div className="pos-barcode-section">
+        <div className={styles.posLeftPanel}>
+          <div className={styles.posBarcodeSection}>
             <input
               ref={codigoBarraRef}
               type="text"
               placeholder="Escanear código de barras"
               onKeyPress={handleCodigoBarraKeyPress}
-              className="pos-input"
+              className={styles.posInput}
             />
           </div>
           
-          <div className="pos-search-section">
+          <div className={styles.posSearchSection}>
             <input
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               placeholder="Buscar por nombre"
-              className="pos-input"
+              className={styles.posInput}
             />
             <button
               onClick={() => buscarProducto(busqueda)}
-              className="pos-search-button"
+              className={styles.posSearchButton}
             >
               <FaSearch /> Buscar
             </button>
           </div>
   
-          <div className="pos-client-section">
+          <div className={styles.posClientSection}>
             <input
               type="text"
-              placeholder="NIT del cliente"
-              onChange={(e) => buscarCliente(e.target.value)}
-              className="pos-input"
+              value={nitBusqueda}
+              placeholder="Ingrese NIT y presione Enter"
+              onChange={(e) => setNitBusqueda(e.target.value)}
+              onKeyPress={handleBuscarCliente}
+              className={styles.posInput}
             />
             {cliente && (
-              <div className="pos-client-info">
-                <p className="pos-client-name">Cliente: {cliente.nombre}</p>
-                <p className="pos-client-nit">NIT: {cliente.nit}</p>
+              <div className={styles.posClientInfo}>
+                <p className={styles.posClientName}>Cliente: {cliente.nombre}</p>
+                <p className={styles.posClientNit}>NIT: {cliente.nit}</p>
               </div>
             )}
           </div>
   
-          {/* Nueva sección de pago en el panel izquierdo */}
-          <div className="pos-payment-section">
-            <h3 className="pos-payment-title">
+          <div className={styles.posPaymentSection}>
+            <h3 className={styles.posPaymentTitle}>
               <FaMoneyBillWave /> Información de Pago
             </h3>
-            <div className="pos-payment-details">
+            <div className={styles.posPaymentDetails}>
               <input
                 type="number"
                 value={montoRecibido}
                 onChange={(e) => setMontoRecibido(e.target.value)}
                 placeholder="Monto recibido"
-                className="pos-payment-input"
+                className={styles.posPaymentInput}
               />
               {parseFloat(montoRecibido) > 0 && (
-                <div className="pos-change-container">
+                <div className={styles.posChangeContainer}>
                   <span>Cambio:</span>
-                  <span className="pos-change-amount">Q{calcularCambio().toFixed(2)}</span>
+                  <span className={styles.posChangeAmount}>Q{calcularCambio().toFixed(2)}</span>
                 </div>
               )}
             </div>
             <button
               onClick={realizarVenta}
               disabled={carrito.length === 0 || !montoRecibido || parseFloat(montoRecibido) < calcularTotal()}
-              className="pos-complete-sale"
+              className={styles.posCompleteSale}
             >
               <FaMoneyBillWave /> COMPLETAR VENTA
             </button>
           </div>
         </div>
   
-        {/* Panel Derecho - Solo Carrito y Total */}
-        <div className="pos-right-panel">
-          <div className="pos-cart-container">
-            <h2 className="pos-cart-title">
+        <div className={styles.posRightPanel}>
+          <div className={styles.posCartContainer}>
+            <h2 className={styles.posCartTitle}>
               <FaShoppingCart /> Carrito de Compras
             </h2>
-            
-            <div className="pos-cart-items">
+            <div className={styles.posCartItems}>
               {carrito.map(item => (
-                <div key={`${item.tipo_item}-${item.id}`} className="pos-cart-item">
-                  <div className="pos-item-details">
-                    <p className="pos-item-name">{item.nombre}</p>
-                    <p className="pos-item-stock">
+                <div key={`${item.tipo_item}-${item.id}`} className={styles.posCartItem}>
+                  <div className={styles.posItemDetails}>
+                    <p className={styles.posItemName}>{item.nombre}</p>
+                    <p className={styles.posItemStock}>
                       {item.tipo_item === 'servicio' ? 'Servicio' : `Stock: ${item.stock}`}
                     </p>
                   </div>
-                  <div className="pos-quantity-controls">
+                  <div className={styles.posQuantityControls}>
                     <button
                       onClick={() => actualizarCantidad(item.id, item.tipo_item, item.cantidad - 1)}
-                      className="pos-quantity-button"
+                      className={styles.posQuantityButton}
                       disabled={item.cantidad <= 1}
                     >
                       <FaMinus />
                     </button>
-                    <span className="pos-quantity">{item.cantidad}</span>
+                    <span className={styles.posQuantity}>{item.cantidad}</span>
                     <button
                       onClick={() => actualizarCantidad(item.id, item.tipo_item, item.cantidad + 1)}
-                      className="pos-quantity-button"
+                      className={styles.posQuantityButton}
                       disabled={item.tipo_item !== 'servicio' && item.cantidad >= item.stock}
                     >
                       <FaPlus />
                     </button>
                   </div>
-                  <div className="pos-item-subtotal">
+                  <div className={styles.posItemSubtotal}>
                     <p>Q{Number(item.subtotal).toFixed(2)}</p>
                   </div>
                   <button
                     onClick={() => eliminarDelCarrito(item.id, item.tipo_item)}
-                    className="pos-delete-button"
+                    className={styles.posDeleteButton}
                   >
                     <FaTrash />
                   </button>
@@ -382,13 +394,61 @@ export default function Ventas() {
               ))}
             </div>
   
-            <div className="pos-cart-total">
-              <span className="pos-total-label">Total:</span>
-              <span className="pos-total-amount">Q{calcularTotal().toFixed(2)}</span>
+            <div className={styles.posCartTotal}>
+              <span className={styles.posTotalLabel}>Total:</span>
+              <span className={styles.posTotalAmount}>Q{calcularTotal().toFixed(2)}</span>
             </div>
           </div>
         </div>
       </div>
+  
+      {mostrarFormularioCliente && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <h2>Nuevo Cliente</h2>
+            <form onSubmit={handleCrearCliente} className={styles.clientForm}>
+              <div className={styles.formGroup}>
+                <label>NIT:</label>
+                <input
+                  type="text"
+                  value={nuevoCliente.nit}
+                  disabled
+                  className={styles.inputDisabled}
+                />
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label>Nombre:</label>
+                <input
+                  type="text"
+                  name="nombre"
+                  value={nuevoCliente.nombre}
+                  onChange={handleInputChange}
+                  placeholder="Ingrese el nombre del cliente"
+                  required
+                  autoFocus
+                />
+              </div>
+  
+              <div className={styles.formButtons}>
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    setMostrarFormularioCliente(false);
+                    setNitBusqueda('');
+                  }}
+                  className={styles.cancelBtn}
+                >
+                  Cancelar
+                </button>
+                <button type="submit" className={styles.submitBtn}>
+                  Crear Cliente
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
   
       <ToastContainer />
     </div>

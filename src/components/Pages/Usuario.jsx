@@ -150,7 +150,7 @@ function Usuario() {
             direccion: "",
             id_rol: "",
         });
-        setModoEditar(false); // Restablecer modoEditar al crear un nuevo usuario
+        setModoEditar(false); 
     };
 
     const buscarUsuarios = (e) => {

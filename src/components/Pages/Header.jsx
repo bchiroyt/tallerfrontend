@@ -5,7 +5,7 @@ function Header({ onLogout, onToggleSidebar }) {
   return (
     <header className="header">
       <button className="menu-btn" onClick={onToggleSidebar}>
-        &#9776; {/* Icono del menú */}
+        &#9776; 
       </button>
       <h1 className="header-title">Descuentazo-Bike</h1>
       <button className="logout-btn" onClick={onLogout}>

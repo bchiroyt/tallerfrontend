@@ -1,4 +1,4 @@
-import '../styles/inicio.css'; // Estilos específicos para la página de inicio
+import '../styles/inicio.css'; 
 import LogoInicio from '../../assets/Inicio.jpg';
 
 function Inicio() {

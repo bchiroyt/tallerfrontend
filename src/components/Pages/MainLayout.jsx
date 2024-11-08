@@ -9,23 +9,23 @@ function MainLayout({ children }) {
   const navigate = useNavigate();
 
   const toggleSidebar = () => {
-    setSidebarVisible(!sidebarVisible); // Alterna la visibilidad de la barra lateral
+    setSidebarVisible(!sidebarVisible); 
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // Elimina el token del localStorage
-    navigate("/"); // Redirige al login
+    localStorage.removeItem("token"); 
+    navigate("/"); 
   }; 
 
   return (
     <div className="app-container">
-      {/* Header con botón para alternar la barra lateral */}
+    
       <Header onLogout={handleLogout} onToggleSidebar={toggleSidebar} />
       
-      {/* Barra lateral, visible o no según el estado */}
+      
       <Sidebar visible={sidebarVisible} />
 
-      {/* Contenido principal */}
+     
       <div className={`content ${sidebarVisible ? 'shifted' : ''}`}>
         {children}
       </div>

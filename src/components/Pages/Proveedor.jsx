@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../styles/proveedor.css'; // Asegúrate de que este archivo CSS exista
+import '../styles/proveedor.css'; 
 import actualizarIcon from '../../assets/actualizar1.png';
 import eliminarIcon from '../../assets/eliminar.png';
-import activarIcon from '../../assets/switch.png'; // Asegúrate de tener este ícono
+import activarIcon from '../../assets/switch.png'; 
 
 function Proveedor() {
     const [proveedores, setProveedores] = useState([]);
@@ -124,7 +124,8 @@ function Proveedor() {
             persona_contacto: "",
             direccion: "",
             telefono: "",
-        });
+        }); 
+        setModoEditar(false);
     };
 
     const buscarProveedores = (e) => {
@@ -139,7 +140,7 @@ function Proveedor() {
     };
 
     const toggleEstadoProveedor = (proveedor) => {
-        const nuevoEstado = !proveedor.estado_prov; // Cambia el estado
+        const nuevoEstado = !proveedor.estado_prov; 
         axios.patch(`${URL}/proveedores/${proveedor.id_proveedor}/estado`, { estado_prov: nuevoEstado }, {
             headers: {
                 Authorization: `Bearer ${token}`,

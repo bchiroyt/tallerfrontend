@@ -1,30 +1,36 @@
 import PropTypes from "prop-types";
 import "../styles/sidebar.css";
 import * as jwtDecode from "jwt-decode"; 
+import { useNavigate } from "react-router-dom"; 
 
 function Sidebar({ visible }) {
+  const navigate = useNavigate(); 
   const token = localStorage.getItem("token");
   if (!token) {
     console.error("Token no encontrado en localStorage");
-    return null; // O muestra un mensaje de error adecuado
+    return null; 
   }
 
   let decodedToken;
   try {
-    decodedToken = jwtDecode.jwtDecode(token); // Usa jwtDecode.jwtDecode en lugar de jwt_decode
+    decodedToken = jwtDecode.jwtDecode(token); 
   } catch (error) {
     console.error("Error al decodificar el token:", error);
-    return null; // O muestra un mensaje de error adecuado
+    return null; 
   }
 
   const permisos = decodedToken.permisos;
   if (!Array.isArray(permisos)) {
     console.error("Permisos no es un array:", permisos);
-    return null; // O muestra un mensaje de error adecuado
+    return null; 
   }
 
   const tienePermiso = (id_modulo) => {
     return permisos.some(permiso => permiso.id_modulo === id_modulo);
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path); 
   };
 
   return (
@@ -36,79 +42,70 @@ function Sidebar({ visible }) {
           <br/>
           <br/>
         </div>
-        {tienePermiso(18) && <li className="mod"><a href="./Inicio">Modulos</a></li>}
+        {tienePermiso(18) && <li className="mod" onClick={() => handleNavigation("/Inicio")}>Módulos</li>}
         {tienePermiso(1) && (
           <li>
-            <a href="#">Reportes</a>
+            <a>Reportes</a>
             <ul className="submenu">
-              <li><a href="#">Reporte de Venta</a></li>
-              <li><a href="#">Reporte de Ingresos</a></li>
+              <li onClick={() => handleNavigation("/ReportesVentas")}>Reporte de Venta</li>
+              <li onClick={() => handleNavigation("/ReportesIngresos")}>Reporte de Ingresos</li>
             </ul>
           </li>
         )}
         {tienePermiso(3) && (
           <li>
-            <a href="#">Compras</a>
+            <a>Compras</a>
             <ul className="submenu">
-              <li><a href="./ListaCompra">Ingreso</a></li>
-              <li><a href="./Proveedor">Proveedores</a></li>
+              <li onClick={() => handleNavigation("/ListaCompra")}>Ingreso</li>
+              <li onClick={() => handleNavigation("/Proveedor")}>Proveedores</li>
             </ul>
           </li>
         )}
         {tienePermiso(4) && (
           <li>
-            <a href="#">Ventas</a>
+            <a>Ventas</a>
             <ul className="submenu">
-              <li><a href="./GestionCaja">Caja</a></li>
-              <li><a href="./Ventas">Venta</a></li>
-              <li><a href="./Clientes">Cliente</a></li>
-              <li><a href="./Reembolsos">Devoluciones</a></li>
+              <li onClick={() => handleNavigation("/GestionCaja")}>Caja</li>
+              <li onClick={() => handleNavigation("/Ventas")}>Venta</li>
+              <li onClick={() => handleNavigation("/ListaVentas")}>Lista de Ventas</li>
+              <li onClick={() => handleNavigation("/Clientes")}>Cliente</li>
             </ul>
           </li>
         )}
         {tienePermiso(2) && (
           <li>
-            <a href="#">Inventario</a>
+            <a>Inventario</a>
             <ul className="submenu">
-              <li><a href="./Productos">Producto</a></li>
-              <li><a href="./Accesorios">Accesorios</a></li>
-              <li><a href="./Bicicletas">Bicicletas</a></li>
-              <li><a href="./Categoria">Categoría</a></li>
-            </ul>
-          </li>
-        )}
-        {tienePermiso(5) && (
-          <li>
-            <a href="#">Consultas</a>
-            <ul className="submenu">
-              <li><a href="#">Consulta Venta</a></li>
-              <li><a href="#">Consulta Ingreso</a></li>
+              <li onClick={() => handleNavigation("/Productos")}>Producto</li>
+              <li onClick={() => handleNavigation("/Accesorios")}>Accesorios</li>
+              <li onClick={() => handleNavigation("/Bicicletas")}>Bicicletas</li>
+              <li onClick={() => handleNavigation("/Categoria")}>Categoría</li>
             </ul>
           </li>
         )}
         {tienePermiso(6) && (
           <li>
-            <a href="#">Usuarios</a>
+            <a>Usuarios</a>
             <ul className="submenu">
-              <li><a href="./RolesModulosPermisos">Roles y Modulos</a></li>
-              <li><a href="./Usuario">Usuarios</a></li>
+              <li onClick={() => handleNavigation("/Usuario")}>Usuarios</li>
+              <li onClick={() => handleNavigation("/RolesModulosPermisos")}>Roles y Módulos</li>
             </ul>
           </li>
         )}
         {tienePermiso(22) && (
           <li>
-            <a href="#">Servicios</a>
+            <a>Servicios</a>
             <ul className="submenu">
-              <li><a href="./Citas">Citas</a></li>
-              <li><a href="./Servicio">Servicio</a></li>
+              <li onClick={() => handleNavigation("/Citas")}>Citas</li>
+              <li onClick={() => handleNavigation("/Servicio")}>Servicio</li>
             </ul>
           </li>
         )}
         {tienePermiso(7) && (
           <li>
-            <a href="#">Ayuda</a>
+            <a>Ayuda</a>
             <ul className="submenu">
-              <li><a href="#">Manual de Usuario</a></li>
+              <li onClick={() => handleNavigation("#")}>Manual de Usuario</li>
             </ul>
           </li>
         )}
@@ -118,7 +115,7 @@ function Sidebar({ visible }) {
 }
 
 Sidebar.propTypes = {
-  visible: PropTypes.bool.isRequired, // Define que visible es un booleano y es requerido
+  visible: PropTypes.bool.isRequired, 
 };
 
 export default Sidebar;

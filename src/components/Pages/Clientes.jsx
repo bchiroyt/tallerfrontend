@@ -2,9 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../styles/cliente.css'; 
-import actualizarIcon from '../../assets/actualizar1.png';
-import eliminarIcon from '../../assets/eliminar.png';
+import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
+import styles from '../styles/cliente.module.css'; // Cambia a CSS Modules
 
 function Cliente() {
     const [clientes, setClientes] = useState([]);
@@ -19,8 +18,7 @@ function Cliente() {
     const [modoEditar, setModoEditar] = useState(false);
     const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
     const [buscar, setBuscar] = useState("");
-    const [clientesFiltrados, setClientesFiltrados] = useState([]); // Lista filtrada de clientes
-    
+    const [clientesFiltrados, setClientesFiltrados] = useState([]);
 
     const token = localStorage.getItem("token");
     const URL = import.meta.env.VITE_URL;
@@ -33,7 +31,7 @@ function Cliente() {
         })
             .then((response) => {
                 setClientes(response.data.clientes);
-                setClientesFiltrados(response.data.clientes); // Inicializa la lista filtrada
+                setClientesFiltrados(response.data.clientes);
             })
             .catch((error) => {
                 console.error("Error al obtener clientes:", error);
@@ -62,7 +60,7 @@ function Cliente() {
             .then(() => {
                 obtenerClientes();
                 resetForm();
-                setMostrarModal(false)
+                setMostrarModal(false);
                 toast.success("Cliente creado exitosamente");
             })
             .catch((error) => {
@@ -127,42 +125,46 @@ function Cliente() {
             email: "",
             direccion: "",
             telefono: "",
-        }); 
+        });
+        setModoEditar(false); // Asegúrate de restablecer el modo de edición
     };
+    
 
     const buscarClientes = (e) => {
         const searchTerm = e.target.value.toLowerCase();
         setBuscar(searchTerm);
-        setClientesFiltrados( // Filtra sobre la lista original
+        setClientesFiltrados(
             clientes.filter((cliente) =>
-                cliente.nombre.toLowerCase().includes(searchTerm) || // Buscar por nombre
-                (cliente.nit && cliente.nit.toString().toLowerCase().includes(searchTerm)) // Buscar por NIT
+                cliente.nombre.toLowerCase().includes(searchTerm) ||
+                (cliente.nit && cliente.nit.toString().toLowerCase().includes(searchTerm))
             )
         );
     };
 
     return (
-        <div className="cat-contenido">
-            <div className='primero'> </div>
-            <div className="cat-header">
-                <h1 className="nombre-pagina">Gestión de Clientes</h1>
-                <input
-                    type="text"
-                    placeholder="Buscar Cliente"
-                    className="buscar-categoria"
-                    value={buscar}
-                    onChange={buscarClientes}
-                />
-                <button
-                    onClick={() => { setMostrarModal(true); resetForm(); }}
-                    className="nueva-categoria-btn"
-                >
-                    + Nuevo Cliente
-                </button>
+        <div className={styles.clienteContainer}>
+            <div className={styles.clie}></div>
+            <div className={styles.header}>
+                <h1 className={styles.pageTitle}>Gestión de Clientes</h1>
+                <div className={styles.searchContainer}>
+                    <input
+                        type="text"
+                        placeholder="Buscar Cliente"
+                        className={styles.searchInput}
+                        value={buscar}
+                        onChange={buscarClientes}
+                    />
+                    <button
+                        onClick={() => { setMostrarModal(true); resetForm(); }}
+                        className={styles.newClientButton}
+                    >
+                        <FaPlus /> Nuevo Cliente
+                    </button>
+                </div>
             </div>
 
-            <div className="segundo">
-                <table className="tabla-categorias">
+            <div className={styles.tableContainer}>
+                <table className={styles.clienteTable}>
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -174,27 +176,25 @@ function Cliente() {
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>                        
+                    <tbody>
                         {clientesFiltrados.map((cliente) => (
                             <tr key={cliente.id_cliente}>
                                 <td>{cliente.id_cliente}</td>
-                                <td>{cliente.nombre}</td>                                
+                                <td>{cliente.nombre}</td>
                                 <td>{cliente.nit}</td>
                                 <td>{cliente.email}</td>
                                 <td>{cliente.direccion}</td>
                                 <td>{cliente.telefono}</td>
                                 <td>
-                                    <img
-                                        src={actualizarIcon}
-                                        alt="Actualizar"
+                                    <FaEdit
                                         onClick={() => seleccionarCliente(cliente)}
-                                        className="accion-icon"
+                                        className={styles.actionIcon}
+                                        title="Actualizar"
                                     />
-                                    <img
-                                        src={eliminarIcon}
-                                        alt="Eliminar"
+                                    <FaTrash
                                         onClick={() => eliminarCliente(cliente.id_cliente)}
-                                        className="accion-icon"
+                                        className={styles.actionIcon}
+                                        title="Eliminar"
                                     />
                                 </td>
                             </tr>
@@ -204,59 +204,59 @@ function Cliente() {
             </div>
 
             {mostrarModal && (
-                <div className="modal">
-                    <div className="modal-content">
+                <div className={styles.modal}>
+                    <div className={styles.modalContent}>
                         <h2>{modoEditar ? "Actualizar Cliente" : "Nuevo Cliente"}</h2>
                         <form onSubmit={modoEditar ? actualizarCliente : crearCliente}>
-                        <input
-                            type="text"
-                            name="nombre"
-                            value={nuevaCliente.nombre}
-                            onChange={handleInputChange}
-                            placeholder="Nombre"
-                            required
-                        />
-                        <input
-                            type="number"
-                            name="nit"
-                            value={nuevaCliente.nit}
-                            onChange={handleInputChange}
-                            placeholder="Nit"
-                            required
-                        />
-                        <input
-                            type="email"
-                            name="email"
-                            value={nuevaCliente.email}
-                            onChange={handleInputChange}
-                            placeholder="Email"
-                            required
-                        />
-                        <input
-                            type="text"
-                            name="direccion"
-                            value={nuevaCliente.direccion}
-                            onChange={handleInputChange}
-                            placeholder="Dirección"
-                            required
-                        />
-                        <input
-                            type="text"
-                            name="telefono"
-                            value={nuevaCliente.telefono}
-                            onChange={handleInputChange}
-                            placeholder="Teléfono"
-                            required
-                        />
-                        <div className="modal-buttons">
-                            <button type="button" className="cancelar-btn" onClick={() => setMostrarModal(false)}>Cancelar</button>
-                            <button type="submit" className="guardar-btn">
-                                {modoEditar ? "Actualizar Cliente" : "Crear Cliente"}
-                            </button>
-                        </div>
-                    </form>
+                            <input
+                                type="text"
+                                name="nombre"
+                                value={nuevaCliente.nombre}
+                                onChange={handleInputChange}
+                                placeholder="Nombre"
+                                required
+                            />
+                            <input
+                                type="number"
+                                name="nit"
+                                value={nuevaCliente.nit}
+                                onChange={handleInputChange}
+                                placeholder="Nit"
+                                required
+                            />
+                            <input
+                                type="email"
+                                name="email"
+                                value={nuevaCliente.email}
+                                onChange={handleInputChange}
+                                placeholder="Email"
+                                required
+                            />
+                            <input
+                                type="text"
+                                name="direccion"
+                                value={nuevaCliente.direccion}
+                                onChange={handleInputChange}
+                                placeholder="Dirección"
+                                required
+                            />
+                            <input
+                                type="text"
+                                name="telefono"
+                                value={nuevaCliente.telefono}
+                                onChange={handleInputChange}
+                                placeholder="Teléfono"
+                                required
+                            />
+                            <div className={styles.modalButtons}>
+                                <button type="button" className={styles.cancelButton} onClick={() => setMostrarModal(false)}>Cancelar</button>
+                                <button type="submit" className={styles.saveButton}>
+                                    {modoEditar ? "Actualizar Cliente" : "Crear Cliente"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div>
             )}
         
             <ToastContainer position="top-right" autoClose={3000} />

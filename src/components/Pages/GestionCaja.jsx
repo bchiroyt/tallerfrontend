@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../styles/gestionCaja.css';
+import { FaPlus, FaMinus, FaHistory } from 'react-icons/fa';
+import styles from '../styles/gestionCaja.module.css';
 
 export default function GestionCaja() {
   const [cajaActual, setCajaActual] = useState(null);
@@ -23,7 +24,6 @@ export default function GestionCaja() {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       if (response.data.ok && response.data.caja) {
-        // Convertir los valores numéricos
         const cajaFormateada = {
           ...response.data.caja,
           monto_inicial: Number(response.data.caja.monto_inicial),
@@ -63,7 +63,6 @@ export default function GestionCaja() {
       });
   
       if (response.data.ok) {
-        // Convertir los valores numéricos
         const historialFormateado = response.data.historial.map(caja => ({
           ...caja,
           monto_inicial: Number(caja.monto_inicial),
@@ -93,7 +92,7 @@ export default function GestionCaja() {
   
       if (response.data.ok) {
         toast.success('Caja abierta exitosamente');
-        setCajaActual(response.data.caja); // Actualizar directamente con la caja devuelta
+        setCajaActual(response.data.caja);
         setMontoInicial('');
       } else {
         toast.error(response.data.msg || 'Error al abrir la caja');
@@ -134,26 +133,26 @@ export default function GestionCaja() {
 
   return (
     <div>
-      <div className='gesca'></div>
-      <div className="gestion-caja-container">
+      <div className={styles.gesca}></div>
+      <div className={styles.gestionCajaContainer}>
         <h1 className="text-2xl font-bold mb-4">Gestión de Caja</h1>
 
         {!cajaActual ? (
-          <div className="abrir-caja bg-white p-4 rounded shadow">
+          <div className={`${styles.abrirCaja} bg-white p-4 rounded shadow`}>
             <h2 className="text-xl font-semibold mb-2">Abrir Caja</h2>
             <input
               type="number"
               value={montoInicial}
               onChange={(e) => setMontoInicial(e.target.value)}
               placeholder="Monto inicial"
-              className="w-full p-2 border rounded mb-2"
+              className={`${styles.montoInput} w-full`}
             />
-            <button onClick={abrirCaja} className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
-              Abrir Caja
+            <button onClick={abrirCaja} className={`${styles.abrirBtn} bg-blue-500 text-white p-2 rounded hover:bg-blue-600`}>
+              <FaPlus className={styles.buttonIcon} /> Abrir Caja
             </button>
           </div>
         ) : (
-          <div className="cerrar-caja bg-white p-4 rounded shadow">
+          <div className={`${styles.cerrarCaja} bg-white p-4 rounded shadow`}>
             <h2 className="text-xl font-semibold mb-2">Cerrar Caja</h2>
             <p>Caja abierta el: {new Date(cajaActual.fecha_apertura).toLocaleString()}</p>
             <p>Monto inicial: Q{Number(cajaActual.monto_inicial).toFixed(2)}</p>
@@ -163,52 +162,50 @@ export default function GestionCaja() {
               value={montoFinal}
               onChange={(e) => setMontoFinal(e.target.value)}
               placeholder="Monto final"
-              className="w-full p-2 border rounded mb-2"
+              className={`${styles.montoInput} w-full`}
             />
-            <button onClick={cerrarCaja} className="bg-red-500 text-white p-2 rounded hover:bg-red-600">
-              Cerrar Caja
+            <button onClick={cerrarCaja} className={`${styles.cerrarBtn} bg-red-500 text-white p-2 rounded hover:bg-red-600`}>
+              <FaMinus className={styles.buttonIcon} /> Cerrar Caja
             </button>
           </div>
         )}
 
-        <div className="historial-cajas mt-8">
-          <h2 className="text-xl font-semibold mb-2">Historial de Cajas</h2>
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="border p-2">Fecha Apertura</th>
-                <th className="border p-2">Fecha Cierre</th>
-                <th className="border p-2">Monto Inicial</th>
-                <th className="border p-2">Monto Final</th>
-                <th className="border p-2">Total Ventas</th>
-              </tr>
-            </thead>
-            <tbody>
-              {historial && historial.length > 0 ? (
-                historial.map((caja) => (
-                  <tr key={caja.id_caja} className="hover:bg-gray-100">
-                    <td className="border p-2">{new Date(caja.fecha_apertura).toLocaleString()}</td>
-                    <td className="border p-2">
-                      {caja.fecha_cierre ? new Date(caja.fecha_cierre).toLocaleString() : 'Abierta'}
-                    </td>
-                    <td className="border p-2">
-                      Q{Number(caja.monto_inicial).toFixed(2)}
-                    </td>
-                    <td className="border p-2">
-                      {caja.monto_final ? `Q${Number(caja.monto_final).toFixed(2)}` : '-'}
-                    </td>
-                    <td className="border p-2">
-                      Q{Number(caja.total_ventas_reales || 0).toFixed(2)}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="border p-2 text-center">No hay registros disponibles</td>
+        <div className={`${styles.historialCajas} mt-8`}>
+          <h2 className="text-xl font-semibold mb-2">
+            <FaHistory className={styles.subtitleIcon} /> Historial de Cajas
+          </h2>
+          <div className={styles.tableContainer}>
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className={styles.tableHeader}>
+                  <th className="border p-2">Fecha Apertura</th>
+                  <th className="border p-2">Fecha Cierre</th>
+                  <th className="border p-2">Monto Inicial</th>
+                  <th className="border p-2">Monto Final</th>
+                  <th className="border p-2">Total Ventas</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {historial && historial.length > 0 ? (
+                  historial.map((caja) => (
+                    <tr key={caja.id_caja} className={styles.tableRow}>
+                      <td className="border p-2">{new Date(caja.fecha_apertura).toLocaleString()}</td>
+                      <td className="border p-2">
+                        {caja.fecha_cierre ? new Date(caja.fecha_cierre).toLocaleString() : 'Abierta'}
+                      </td>
+                      <td className="border p-2">Q{Number(caja.monto_inicial).toFixed(2)}</td>
+                      <td className="border p-2">{caja.monto_final ? `Q${Number(caja.monto_final).toFixed(2)}` : '-'}</td>
+                      <td className="border p-2">Q{Number(caja.total_ventas_reales || 0).toFixed(2)}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="border p-2 text-center">No hay registros disponibles</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
         <ToastContainer />
       </div>

@@ -21,7 +21,10 @@ import Citas from "./components/Pages/Citas";
 import Servicio from "./components/Pages/Servicio";
 import GestionCaja from "./components/Pages/GestionCaja";
 import Ventas from "./components/Pages/Ventas";
-import Reembolsos from "./components/Pages/Reembolsos"
+import ListaVentas from "./components/Pages/ListaVentas";
+import Reembolsos from "./components/Pages/Reembolsos";
+import ReportesIngresos from "./components/Pages/ReportesIngresos";
+import ReportesVentas from "./components/Pages/ReportesVentas";
 
 function App() {
   return (
@@ -222,11 +225,41 @@ function App() {
           }
         />
         <Route
-          path="/reembolsos"
+          path="/listaventas"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <ListaVentas />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/reembolsos/:id_venta"
           element={
             <PrivateRoute>
               <MainLayout>
                 <Reembolsos />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/reportesingresos"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <ReportesIngresos />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/reportesventas"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <ReportesVentas/>
               </MainLayout>
             </PrivateRoute>
           }

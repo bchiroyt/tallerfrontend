@@ -1,7 +1,17 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { 
+  FaShoppingCart, 
+  FaPlus, 
+  FaReceipt, 
+  FaStore, 
+  FaCalendarAlt, 
+  FaDollarSign, 
+  FaCog,
+  FaEye 
+} from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import '../styles/listacompras.css';
+import styles from '../styles/listaCompras.module.css';
 
 const URL = import.meta.env.VITE_URL;
 
@@ -25,42 +35,70 @@ const ListaCompras = () => {
   }, []);
 
   return (
-    <div className="compras-container">
-      <div className='licom'></div>
-      <h1 className="compras-title">Lista de Compras</h1>
-      <Link to="/nueva-compra" className="compras-button mb-4 inline-block">
-        Nueva Compra
-      </Link>
-      <table className="compras-table">
-        <thead>
-          <tr>
-            <th>Nº Comprobante</th>
-            <th>Proveedor</th>
-            <th>Fecha</th>
-            <th>Total</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {compras.map((compra) => (
-            <tr key={compra.id_compra}>
-              <td>{compra.numero_comprobante}</td>
-              <td>{compra.proveedor_nombre}</td>
-              <td>{new Date(compra.fecha_facturacion).toLocaleDateString()}</td>
-              <td>
-                ${typeof compra.total_compra === 'number' 
-                  ? compra.total_compra.toFixed(2) 
-                  : Number(compra.total_compra).toFixed(2)}
-              </td>
-              <td>
-                <Link to={`/compras/${compra.id_compra}`} className="budet">
-                  Ver detalles
-                </Link>
-              </td>
+    <div className={styles.comprasContainer}>
+      <div className={styles.licom}></div>
+      <div className={styles.headerSection}>
+        <h1 className={styles.mainTitle}>
+          <FaShoppingCart className={styles.titleIcon} />
+          Lista de Compras
+        </h1>
+        <Link to="/nueva-compra" className={styles.newButton}>
+          <FaPlus className={styles.buttonIcon} />
+          Nueva Compra
+        </Link>
+      </div>
+  
+      <div className={styles.tableWrapper}>
+        <table className={styles.comprasTable}>
+          <thead>
+            <tr>
+              <th>
+                <FaReceipt className={styles.headerIcon} />
+                Nº Comprobante
+              </th>
+              <th>
+                <FaStore className={styles.headerIcon} />
+                Proveedor
+              </th>
+              <th>
+                <FaCalendarAlt className={styles.headerIcon} />
+                Fecha
+              </th>
+              <th>
+                <FaDollarSign className={styles.headerIcon} />
+                Total
+              </th>
+              <th>
+                <FaCog className={styles.headerIcon} />
+                Acciones
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {compras.map((compra) => (
+              <tr key={compra.id_compra}>
+                <td>{compra.numero_comprobante}</td>
+                <td>{compra.proveedor_nombre}</td>
+                <td>{new Date(compra.fecha_facturacion).toLocaleDateString()}</td>
+                <td className={styles.montoCell}>
+                  Q{typeof compra.total_compra === 'number' 
+                    ? compra.total_compra.toFixed(2) 
+                    : Number(compra.total_compra).toFixed(2)}
+                </td>
+                <td>
+                  <Link 
+                    to={`/compras/${compra.id_compra}`} 
+                    className={styles.detailButton}
+                  >
+                    <FaEye className={styles.buttonIcon} />
+                    Ver detalles
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

@@ -1,0 +1,77 @@
+.gesca {
+  height: 50px;
+}
+
+.gestionCajaContainer {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.abrirCaja,
+.cerrarCaja {
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+}
+
+.montoInput {
+  width: 50%;
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.abrirBtn,
+.cerrarBtn {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.abrirBtn:hover {
+  background-color: #1258a3;
+}
+
+.cerrarBtn:hover {
+  background-color: #c0392b;
+}
+
+.historialCajas {
+  margin-top: 20px;
+}
+
+.tableContainer {
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tableHeader {
+  background-color: #0ba10b;
+  color: white;
+}
+
+.tableRow:hover {
+  background-color: #f1f5f9;
+}
+
+.tableRow:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.tableRow td {
+  padding: 12px;
+  border: 1px solid #ddd;
+}
+
+.subtitleIcon {
+  margin-right: 0.5rem;
+  color: #3b82f6;
+}
