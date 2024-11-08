@@ -5,7 +5,7 @@ import { FaEye, FaFilePdf, FaUndo, FaSearch } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
 import 'react-toastify/dist/ReactToastify.css';
-import styles from '../styles/listaVentas.module.css';
+import styles from '../styles/listaventas.module.css';
 
 Modal.setAppElement('#root');
 
