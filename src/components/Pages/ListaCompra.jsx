@@ -11,7 +11,7 @@ import {
   FaEye 
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import styles from '../styles/listaCompras.module.css';
+import styles from '../styles/listacompras.module.css';
 
 const URL = import.meta.env.VITE_URL;
 
