@@ -3,7 +3,7 @@ import axios from 'axios';
 import { LineChart, Line, BarChart, Bar, Cell, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import styles from '../styles/reportesIngresos.module.css';
+import styles from '../styles/ReportesIngresos.module.css';
 
 const URL = import.meta.env.VITE_URL;
 
