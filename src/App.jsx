@@ -25,6 +25,8 @@ import ListaVentas from "./components/Pages/ListaVentas";
 import Reembolsos from "./components/Pages/Reembolsos";
 import ReportesIngresos from "./components/Pages/ReportesIngresos";
 import ReportesVentas from "./components/Pages/ReportesVentas";
+import ConsultaVentas from "./components/Pages/ConsultaVenta"
+import ConsultaCompra from "./components/Pages/ConsultaCompra"
 
 function App() {
   return (
@@ -260,6 +262,26 @@ function App() {
             <PrivateRoute>
               <MainLayout>
                 <ReportesVentas/>
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/consultasventas"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <ConsultaVentas />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/consultascompras"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <ConsultaCompra />
               </MainLayout>
             </PrivateRoute>
           }
