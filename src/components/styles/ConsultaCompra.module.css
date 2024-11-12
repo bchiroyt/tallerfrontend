@@ -1,116 +1,145 @@
+.prives{
+    height: 70px;
+}
+
 .container {
     padding: 20px;
-    margin-top: 70px;
+    background-color: #f5f5f5;
+    min-height: 100vh;
 }
 
 .header {
-    background-color: #f5f5f5;
-    padding: 20px;
-    border-radius: 8px;
     margin-bottom: 20px;
 }
 
 .header h1 {
-    margin: 0;
     color: #333;
-    font-size: 24px;
     margin-bottom: 20px;
 }
 
 .filtros {
     display: flex;
-    gap: 15px;
+    gap: 20px;
+    margin-bottom: 20px;
     align-items: center;
-    flex-wrap: wrap;
 }
 
-.inputBusqueda {
+.searchInput {
     padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
     width: 250px;
 }
 
-.inputFecha {
+.fechas {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.dateInput {
     padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
 }
 
-.btnBuscar {
-    background-color: #33a5f1;
+.filterButton {
+    padding: 8px 16px;
+    background-color: #4CAF50;
     color: white;
-    padding: 8px 15px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
 }
 
-.btnLimpiar {
-    background-color: #6c757d;
-    color: white;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+.filterButton:hover {
+    background-color: #45a049;
 }
 
-.tablaContainer {
+.tableContainer {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     overflow-x: auto;
 }
 
-.tabla {
+.table {
     width: 100%;
     border-collapse: collapse;
-    background-color: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.tabla th,
-.tabla td {
+.table th,
+.table td {
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
 
-.tabla th {
-    background-color: #f8f9fa;
+.table th {
+    background-color: #45a049b;
     font-weight: 600;
 }
 
-.tabla tr:hover {
-    background-color: #f5f5f5;
-}
-
-.activo {
-    color: #28a745;
-    font-weight: 500;
-}
-
-.inactivo {
-    color: #dc3545;
-    font-weight: 500;
-}
-
 .btnDetalles {
-    background-color: #17a2b8;
-    color: white;
     padding: 6px 12px;
+    background-color: #007bff;
+    color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
 }
 
-@media (max-width: 768px) {
-    .filtros {
-        flex-direction: column;
-        align-items: stretch;
-    }
+.btnDetalles:hover {
+    background-color: #0056b3;
+}
 
-    .inputBusqueda,
-    .inputFecha,
-    .btnBuscar,
-    .btnLimpiar {
-        width: 100%;
-    }
+/* Estilos para el modal de detalles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.tableDetalles {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+.tableDetalles th,
+.tableDetalles td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.btnCerrar {
+    margin-top: 20px;
+    padding: 8px 16px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btnCerrar:hover {
+    background-color: #c82333;
 }

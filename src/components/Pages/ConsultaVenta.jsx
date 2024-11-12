@@ -5,7 +5,7 @@ import styles from '../styles/ConsultaVenta.module.css';
 
 function ConsultaVenta() {
     const [ventas, setVentas] = useState([]);
-    const [filtradas, setFiltradas] = useState([]);
+    const [ventasFiltradas, setVentasFiltradas] = useState([]);
     const [comprobante, setComprobante] = useState('');
     const [fechaInicio, setFechaInicio] = useState('');
     const [fechaFin, setFechaFin] = useState('');
@@ -13,140 +13,125 @@ function ConsultaVenta() {
     const token = localStorage.getItem("token");
     const URL = import.meta.env.VITE_URL;
 
-    const obtenerVentas = async (params = {}) => {
+    const obtenerVentas = async () => {
         try {
-            const response = await axios.get(`${URL}consultas/ventas/consulta`, {
+            const response = await axios.get(`${URL}/consultas/ventas`, {
                 headers: { Authorization: `Bearer ${token}` },
-                params
+                params: {
+                    fechaInicio,
+                    fechaFin,
+                    comprobante
+                }
             });
             setVentas(response.data.ventas);
-            setFiltradas(response.data.ventas);
+            setVentasFiltradas(response.data.ventas);
         } catch (error) {
+            console.error('Error:', error);
             Swal.fire({
                 title: 'Error',
-                text: 'No se pudieron obtener las ventas',
+                text: error.response?.data?.msg || 'Error al obtener las ventas',
                 icon: 'error'
             });
         }
     };
 
     useEffect(() => {
+        const hoy = new Date();
+        const hace30Dias = new Date();
+        hace30Dias.setDate(hace30Dias.getDate() - 30);
+        
+        setFechaInicio(hace30Dias.toISOString().split('T')[0]);
+        setFechaFin(hoy.toISOString().split('T')[0]);
+        
         obtenerVentas();
     }, []);
 
-    const buscarPorComprobante = (e) => {
-        const valor = e.target.value;
-        setComprobante(valor);
-        if (!valor) {
-            setFiltradas(ventas);
-            return;
-        }
-        setFiltradas(ventas.filter(venta => 
-            venta.num_comprobante.toLowerCase().includes(valor.toLowerCase())
-        ));
+    const buscarVentas = (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        setComprobante(searchTerm);
+        setVentasFiltradas(
+            ventas.filter((venta) =>
+                venta.numero_comprobante.toLowerCase().includes(searchTerm)
+            )
+        );
     };
 
-    const buscarPorFechas = async () => {
+    const filtrarPorFechas = async () => {
         if (!fechaInicio || !fechaFin) {
             Swal.fire({
                 title: 'Error',
-                text: 'Por favor seleccione ambas fechas',
+                text: 'Debe seleccionar ambas fechas',
                 icon: 'warning'
             });
             return;
         }
-
-        try {
-            await obtenerVentas({
-                fechaInicio,
-                fechaFin
-            });
-        } catch (error) {
-            Swal.fire({
-                title: 'Error',
-                text: 'Error al buscar por fechas',
-                icon: 'error'
-            });
-        }
-    };
-
-    const limpiarFiltros = () => {
-        setComprobante('');
-        setFechaInicio('');
-        setFechaFin('');
-        obtenerVentas();
+        await obtenerVentas();
     };
 
     return (
-        <div className={styles.container}>
-            <div className={styles.header}>
-                <h1>Consulta de Ventas</h1>
+        <div className={styles.priconst}>
+            <div className={styles.priconst}></div>
+                <div className={styles.header}>
+                    <h1>Consulta de Ventas</h1>
                 <div className={styles.filtros}>
                     <input
                         type="text"
                         placeholder="Buscar por comprobante"
                         value={comprobante}
-                        onChange={buscarPorComprobante}
-                        className={styles.inputBusqueda}
+                        onChange={buscarVentas}
+                        className={styles.searchInput}
                     />
-                    <input
-                        type="date"
-                        value={fechaInicio}
-                        onChange={(e) => setFechaInicio(e.target.value)}
-                        className={styles.inputFecha}
-                    />
-                    <input
-                        type="date"
-                        value={fechaFin}
-                        onChange={(e) => setFechaFin(e.target.value)}
-                        className={styles.inputFecha}
-                    />
-                    <button 
-                        onClick={buscarPorFechas}
-                        className={styles.btnBuscar}
-                    >
-                        Buscar
-                    </button>
-                    <button 
-                        onClick={limpiarFiltros}
-                        className={styles.btnLimpiar}
-                    >
-                        Limpiar Filtros
-                    </button>
+                    <div className={styles.fechas}>
+                        <input
+                            type="date"
+                            value={fechaInicio}
+                            onChange={(e) => setFechaInicio(e.target.value)}
+                            className={styles.dateInput}
+                        />
+                        <input
+                            type="date"
+                            value={fechaFin}
+                            onChange={(e) => setFechaFin(e.target.value)}
+                            className={styles.dateInput}
+                        />
+                        <button 
+                            onClick={filtrarPorFechas}
+                            className={styles.filterButton}
+                        >
+                            Filtrar
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div className={styles.tablaContainer}>
-                <table className={styles.tabla}>
+            <div className={styles.tableContainer}>
+                <table className={styles.table}>
                     <thead>
                         <tr>
                             <th>Comprobante</th>
-                            <th>Fecha</th>
+                            <th>Fecha Venta</th>
                             <th>Cliente</th>
-                            <th>Vendedor</th>
+                            <th>Usuario</th>
+                            <th>Caja</th>
                             <th>Total</th>
+                            <th>Recibido</th>
+                            <th>Cambio</th>
                             <th>Estado</th>
-                            <th>Detalles</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {filtradas.map((venta) => (
+                        {ventasFiltradas.map((venta) => (
                             <tr key={venta.id_venta}>
-                                <td>{venta.num_comprobante}</td>
-                                <td>{new Date(venta.fecha).toLocaleDateString()}</td>
-                                <td>{venta.nombre_cliente}</td>
-                                <td>{venta.nombre_vendedor}</td>
-                                <td>Q{venta.total.toFixed(2)}</td>
-                                <td className={styles[venta.estado ? 'activo' : 'inactivo']}>
-                                    {venta.estado ? 'Activa' : 'Anulada'}
-                                </td>
-                                <td>
-                                    <button 
-                                        className={styles.btnDetalles}
-                                        onClick={() => verDetalles(venta.id_venta)}
-                                    >
-                                        Ver Detalles
-                                    </button>
+                                <td>{venta.numero_comprobante}</td>
+                                <td>{new Date(venta.fecha_venta).toLocaleString()}</td>
+                                <td>{venta.nombre_cliente || 'No especificado'}</td>
+                                <td>{venta.nombre_usuario || 'No especificado'}</td>
+                                <td>Caja #{venta.id_caja || 'N/A'}</td>
+                                <td>Q{Number(venta.total_venta).toFixed(2)}</td>
+                                <td>Q{Number(venta.monto_recibido).toFixed(2)}</td>
+                                <td>Q{Number(venta.cambio).toFixed(2)}</td>
+                                <td className={styles[venta.estado_venta ? 'activo' : 'inactivo']}>
+                                    {venta.estado_venta ? 'Activa' : 'Anulada'}
                                 </td>
                             </tr>
                         ))}

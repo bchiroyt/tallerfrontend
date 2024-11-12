@@ -5,154 +5,188 @@ import styles from '../styles/ConsultaCompra.module.css';
 
 function ConsultaCompra() {
     const [compras, setCompras] = useState([]);
-    const [filtradas, setFiltradas] = useState([]);
+    const [comprasFiltradas, setComprasFiltradas] = useState([]);
     const [comprobante, setComprobante] = useState('');
     const [fechaInicio, setFechaInicio] = useState('');
     const [fechaFin, setFechaFin] = useState('');
+    const [mostrarDetalles, setMostrarDetalles] = useState(false);
+    const [detallesCompra, setDetallesCompra] = useState([]);
 
     const token = localStorage.getItem("token");
     const URL = import.meta.env.VITE_URL;
 
-    const obtenerCompras = async (params = {}) => {
+    const obtenerCompras = async () => {
         try {
-            const response = await axios.get(`${URL}consultas/compras/consulta`, {
+            const response = await axios.get(`${URL}/consultas/compras`, {
                 headers: { Authorization: `Bearer ${token}` },
-                params
+                params: {
+                    fechaInicio,
+                    fechaFin,
+                    comprobante
+                }
             });
             setCompras(response.data.compras);
-            setFiltradas(response.data.compras);
+            setComprasFiltradas(response.data.compras);
         } catch (error) {
+            console.error('Error:', error);
             Swal.fire({
                 title: 'Error',
-                text: 'No se pudieron obtener las compras',
+                text: error.response?.data?.msg || 'Error al obtener las compras',
+                icon: 'error'
+            });
+        }
+    };
+
+    const verDetalles = async (idCompra) => {
+        try {
+            const response = await axios.get(`${URL}/consultas/compras/${idCompra}/detalles`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setDetallesCompra(response.data.detalles);
+            setMostrarDetalles(true);
+        } catch {
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al obtener los detalles',
                 icon: 'error'
             });
         }
     };
 
     useEffect(() => {
+        const hoy = new Date();
+        const hace30Dias = new Date();
+        hace30Dias.setDate(hace30Dias.getDate() - 30);
+        
+        setFechaInicio(hace30Dias.toISOString().split('T')[0]);
+        setFechaFin(hoy.toISOString().split('T')[0]);
+        
         obtenerCompras();
     }, []);
 
-    const buscarPorComprobante = (e) => {
-        const valor = e.target.value;
-        setComprobante(valor);
-        if (!valor) {
-            setFiltradas(compras);
-            return;
-        }
-        setFiltradas(compras.filter(compra => 
-            compra.num_comprobante.toLowerCase().includes(valor.toLowerCase())
-        ));
+    const buscarCompras = (e) => {
+        const searchTerm = e.target.value;
+        setComprobante(searchTerm);
+        setComprasFiltradas(
+            compras.filter((compra) =>
+                compra.numero_comprobante.toString().includes(searchTerm)
+            )
+        );
     };
 
-    const buscarPorFechas = async () => {
+    const filtrarPorFechas = async () => {
         if (!fechaInicio || !fechaFin) {
             Swal.fire({
                 title: 'Error',
-                text: 'Por favor seleccione ambas fechas',
+                text: 'Debe seleccionar ambas fechas',
                 icon: 'warning'
             });
             return;
         }
-
-        try {
-            await obtenerCompras({
-                fechaInicio,
-                fechaFin
-            });
-        } catch (error) {
-            Swal.fire({
-                title: 'Error',
-                text: 'Error al buscar por fechas',
-                icon: 'error'
-            });
-        }
-    };
-
-    const limpiarFiltros = () => {
-        setComprobante('');
-        setFechaInicio('');
-        setFechaFin('');
-        obtenerCompras();
+        await obtenerCompras();
     };
 
     return (
-        <div className={styles.container}>
-            <div className={styles.header}>
+        <div> 
+        <div className={styles.prives}></div>
+            <div className={styles.container}>
+                <div className={styles.header}>
                 <h1>Consulta de Compras</h1>
                 <div className={styles.filtros}>
                     <input
                         type="text"
-                        placeholder="Buscar por comprobante"
+                        placeholder="Buscar por número de comprobante"
                         value={comprobante}
-                        onChange={buscarPorComprobante}
-                        className={styles.inputBusqueda}
+                        onChange={buscarCompras}
+                        className={styles.searchInput}
                     />
-                    <input
-                        type="date"
-                        value={fechaInicio}
-                        onChange={(e) => setFechaInicio(e.target.value)}
-                        className={styles.inputFecha}
-                    />
-                    <input
-                        type="date"
-                        value={fechaFin}
-                        onChange={(e) => setFechaFin(e.target.value)}
-                        className={styles.inputFecha}
-                    />
-                    <button 
-                        onClick={buscarPorFechas}
-                        className={styles.btnBuscar}
-                    >
-                        Buscar
-                    </button>
-                    <button 
-                        onClick={limpiarFiltros}
-                        className={styles.btnLimpiar}
-                    >
-                        Limpiar Filtros
-                    </button>
+                    <div className={styles.fechas}>
+                        <input
+                            type="date"
+                            value={fechaInicio}
+                            onChange={(e) => setFechaInicio(e.target.value)}
+                            className={styles.dateInput}
+                        />
+                        <input
+                            type="date"
+                            value={fechaFin}
+                            onChange={(e) => setFechaFin(e.target.value)}
+                            className={styles.dateInput}
+                        />
+                        <button 
+                            onClick={filtrarPorFechas}
+                            className={styles.filterButton}
+                        >
+                            Filtrar
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div className={styles.tablaContainer}>
-                <table className={styles.tabla}>
+            <div className={styles.tableContainer}>
+                <table className={styles.table}>
                     <thead>
                         <tr>
-                            <th>Comprobante</th>
-                            <th>Fecha</th>
+                            <th>Serie-Comprobante</th>
+                            <th>Tipo</th>
+                            <th>Fecha Compra</th>
+                            <th>Fecha Facturación</th>
                             <th>Proveedor</th>
                             <th>Usuario</th>
                             <th>Total</th>
-                            <th>Estado</th>
-                            <th>Detalles</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {filtradas.map((compra) => (
-                            <tr key={compra.id_compra}>
-                                <td>{compra.num_comprobante}</td>
-                                <td>{new Date(compra.fecha).toLocaleDateString()}</td>
-                                <td>{compra.nombre_proveedor}</td>
-                                <td>{compra.nombre_usuario}</td>
-                                <td>Q{compra.total.toFixed(2)}</td>
-                                <td className={styles[compra.estado ? 'activo' : 'inactivo']}>
-                                    {compra.estado ? 'Activa' : 'Anulada'}
-                                </td>
-                                <td>
-                                    <button 
-                                        className={styles.btnDetalles}
-                                        onClick={() => verDetalles(compra.id_compra)}
-                                    >
-                                        Ver Detalles
-                                    </button>
-                                </td>
+                    {comprasFiltradas.map((compra) => (
+                        <tr key={compra.id_compra}>
+                            <td>{`${compra.serie}-${compra.numero_comprobante}`}</td>
+                            <td>{compra.tipo_comprobante}</td>
+                            <td>{new Date(compra.fecha_compra).toLocaleString()}</td>
+                            <td>{new Date(compra.fecha_facturacion).toLocaleDateString()}</td>
+                            <td>{compra.nombre_proveedor}</td>
+                            <td>{compra.nombre_usuario}</td>
+                            <td>Q{Number(compra.total_compra).toFixed(2)}</td>
+                            
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
+
+            {mostrarDetalles && (
+                <div className={styles.modal}>
+                    <div className={styles.modalContent}>
+                        <h2>Detalles de la Compra</h2>
+                        <table className={styles.tableDetalles}>
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {detallesCompra.map((detalle, index) => (
+                                    <tr key={index}>
+                                        <td>{detalle.nombre_producto}</td>
+                                        <td>{detalle.cantidad}</td>
+                                        <td>Q{detalle.precio_unitario.toFixed(2)}</td>
+                                        <td>Q{detalle.subtotal.toFixed(2)}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        <button 
+                            className={styles.btnCerrar}
+                            onClick={() => setMostrarDetalles(false)}
+                        >
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
         </div>
     );
 }
