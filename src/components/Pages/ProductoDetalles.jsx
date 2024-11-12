@@ -5,7 +5,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/proddetalle.css';
 import actualizarIcon from '../../assets/actualizar1.png';
-import eliminarIcon from '../../assets/eliminar.png';
 
 function ProductoDetalles() {
   const { id } = useParams();
@@ -162,7 +161,6 @@ function ProductoDetalles() {
       </div>
       <div className="acciones-container">
         <img src={actualizarIcon} alt="Actualizar" onClick={() => setEditando(true)} className="accion-icon" />
-        <img src={eliminarIcon} alt="Eliminar" onClick={() => setMostrarConfirmacion(true)} className="accion-icon" />
         <button onClick={toggleEstado} 
                 className={`estado-toggle ${producto.estado ? 'activo' : 'inactivo'}`}>
           {producto.estado ? 'Desactivar' : 'Activar'}

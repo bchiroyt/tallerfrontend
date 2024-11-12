@@ -135,7 +135,6 @@ function Servicio() {
     };
 
     return (
-        <MainLayout>
             <div>
                 <div className='hist'></div>
                 <div className="historial-header">
@@ -222,7 +221,6 @@ function Servicio() {
                 )}
                 <ToastContainer position="top-right" autoClose={3000} />
             </div>
-        </MainLayout>
     );
 }
 

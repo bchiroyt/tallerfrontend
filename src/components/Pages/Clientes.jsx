@@ -191,11 +191,6 @@ function Cliente() {
                                         className={styles.actionIcon}
                                         title="Actualizar"
                                     />
-                                    <FaTrash
-                                        onClick={() => eliminarCliente(cliente.id_cliente)}
-                                        className={styles.actionIcon}
-                                        title="Eliminar"
-                                    />
                                 </td>
                             </tr>
                         ))}

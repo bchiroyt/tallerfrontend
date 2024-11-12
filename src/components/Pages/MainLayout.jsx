@@ -8,27 +8,25 @@ function MainLayout({ children }) {
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const navigate = useNavigate();
 
-  const toggleSidebar = () => {
-    setSidebarVisible(!sidebarVisible); 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token"); 
-    navigate("/"); 
-  }; 
+  const handleToggleSidebar = () => {
+    setSidebarVisible(!sidebarVisible);
+  };
 
   return (
     <div className="app-container">
-    
-      <Header onLogout={handleLogout} onToggleSidebar={toggleSidebar} />
-      
-      
-      <Sidebar visible={sidebarVisible} />
-
-     
-      <div className={`content ${sidebarVisible ? 'shifted' : ''}`}>
+      <Header onLogout={handleLogout} onToggleSidebar={handleToggleSidebar} />
+      <Sidebar 
+        visible={sidebarVisible} 
+        onToggle={handleToggleSidebar}
+      />
+      <main className={`content ${sidebarVisible ? 'shifted' : ''}`}>
         {children}
-      </div>
+      </main>
     </div>
   );
 }

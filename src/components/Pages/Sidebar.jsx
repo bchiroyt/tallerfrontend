@@ -1,10 +1,11 @@
 import PropTypes from "prop-types";
 import "../styles/sidebar.css";
 import * as jwtDecode from "jwt-decode"; 
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 
-function Sidebar({ visible }) {
-  const navigate = useNavigate(); 
+function Sidebar({ visible, onToggle }) {
+  const navigate = useNavigate();
+
   const token = localStorage.getItem("token");
   if (!token) {
     console.error("Token no encontrado en localStorage");
@@ -30,7 +31,8 @@ function Sidebar({ visible }) {
   };
 
   const handleNavigation = (path) => {
-    navigate(path); 
+    navigate(path);
+    onToggle();
   };
 
   return (
@@ -88,7 +90,7 @@ function Sidebar({ visible }) {
             <a>Usuarios</a>
             <ul className="submenu">
               <li onClick={() => handleNavigation("/Usuario")}>Usuarios</li>
-              <li onClick={() => handleNavigation("/RolesModulosPermisos")}>Roles y Módulos</li>
+              <li onClick={() => handleNavigation("/RolesModulosPermisos")}>Roles y Permisos</li>
             </ul>
           </li>
         )}
@@ -101,6 +103,15 @@ function Sidebar({ visible }) {
             </ul>
           </li>
         )}
+        {tienePermiso(5) && (
+          <li>
+            <a>Cunsultas</a>
+            <ul className="submenu">
+              <li onClick={() => handleNavigation("/ConsultasVentas")}>ConsultasVentas</li>
+              <li onClick={() => handleNavigation("/ConsultasCompras")}>ConsultasCompras</li>
+            </ul>
+          </li>
+        )}
         {tienePermiso(7) && (
           <li>
             <a>Ayuda</a>
@@ -109,13 +120,15 @@ function Sidebar({ visible }) {
             </ul>
           </li>
         )}
+         
       </ul>
     </div>
   );
 }
 
 Sidebar.propTypes = {
-  visible: PropTypes.bool.isRequired, 
+  visible: PropTypes.bool.isRequired,
+  onToggle: PropTypes.func.isRequired,
 };
 
 export default Sidebar;

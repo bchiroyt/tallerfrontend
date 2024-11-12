@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import MainLayout from "./MainLayout";
 import "../styles/citas.css";
 import actualizarIcon from '../../assets/actualizar1.png';
 import eliminarIcon from '../../assets/eliminar.png';
@@ -166,7 +165,6 @@ function Citas() {
     };
 
     return (
-        <MainLayout>
             <div> 
                 <div className='citali'></div>
                 <div className="citas-header">
@@ -269,7 +267,6 @@ function Citas() {
                 )}
                 <ToastContainer position="top-right" autoClose={3000} />
             </div>
-        </MainLayout>
     );
 }
 

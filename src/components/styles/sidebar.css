@@ -1,23 +1,22 @@
-/* Estilos generales para la barra lateral */
 .mod{
   text-align: center;
   font-weight: bold;
 }
 .sidebar {
   position: fixed;
-  top: 0; /* Ajustado según la altura del Header */
+  top: 0; 
   left: 0;
   width: 230px;
-  height: 100vh; /* Ocupa toda la altura */
+  height: 100vh; 
   overflow: auto;
   background-color: #333;
-  transition: transform 0.3s ease; /* Transición más fluida */
-  transform: translateX(-100%); /* Oculto por defecto */
+  transition: transform 0.3s ease-in-out; 
+  transform: translateX(-100%); 
   z-index: 100;
 }
 
 .sidebar.visible {
-  transform: translateX(0); /* Visible cuando el sidebar está activado */
+  transform: translateX(0); 
 }
 
 .sidebar ul {
@@ -68,36 +67,36 @@
 
 
 
-/* Estilos responsive */
+
 @media screen and (max-width: 768px) {
   .sidebar {
-    width: 200px; /* Reduce el ancho para pantallas medianas */
+    width: 200px; 
   }
 }
 
 @media screen and (max-width: 480px) {
   .sidebar {
-    width: 100%; /* Ocupa todo el ancho en pantallas pequeñas */
-    height: 100%; /* Ocupa toda la altura */
-    transform: translateX(-100%); /* Oculta por defecto en pantallas pequeñas */
+    width: 100%;
+    height: 100%; 
+    transform: translateX(-100%); 
   }
 
   .sidebar.visible {
-    transform: translateX(0); /* Muestra la barra lateral en móviles cuando es visible */
+    transform: translateX(0); 
   }
 
   .sidebar ul li {
-    padding: 12px 15px; /* Ajusta el padding para pantallas más pequeñas */
-    font-size: 14px; /* Reduce el tamaño de fuente */
+    padding: 12px 15px; 
+    font-size: 14px;
   }
 
   .submenu li {
-    padding: 8px 0; /* Ajusta el padding de los submenús */
-    font-size: 12px; /* Reduce el tamaño de fuente de los submenús */
+    padding: 8px 0; 
+    font-size: 12px; 
   }
 }
 
-/* Estilos para un botón de menú en dispositivos móviles */
+
 .menu-toggle {
   display: none;
 }
@@ -113,6 +112,6 @@
     padding: 10px;
     font-size: 20px;
     cursor: pointer;
-    z-index: 1100;  /*Asegura que esté por encima del sidebar */
+    z-index: 1100;  
   }
 }

@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import MainLayout from "./MainLayout";
 import "../styles/usuario.css";
 import actualizarIcon from '../../assets/actualizar1.png';
 import eliminarIcon from '../../assets/eliminar.png';
 import activarIcon from '../../assets/switch.png';
+import Swal from 'sweetalert2';
 
 function Usuario() {
     const [usuarios, setUsuarios] = useState([]);
@@ -66,31 +66,87 @@ function Usuario() {
     const crearUsuario = async (e) => {
         e.preventDefault();
         try {
-            await axios.post(`${URL}/register`, nuevoUsuario, {
-                headers: { Authorization: `Bearer ${token}` }
+            const result = await Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¿Deseas crear este nuevo usuario?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, crear',
+                cancelButtonText: 'Cancelar'
             });
-            obtenerUsuarios();
-            resetForm();
-            setMostrarModal(false);
-            toast.success("Usuario creado exitosamente");
+
+            if (result.isConfirmed) {
+                await axios.post(
+                    `${URL}/register`, 
+                    nuevoUsuario, 
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                
+                Swal.fire({
+                    title: 'Éxito',
+                    text: 'Usuario creado exitosamente',
+                    icon: 'success',
+                    timer: 1500
+                });
+                
+                obtenerUsuarios();
+                resetForm();
+                setMostrarModal(false);
+            }
         } catch (error) {
             console.error("Error al crear usuario:", error);
-            toast.error("No se pudo crear el usuario. Por favor, intenta más tarde.");
+            Swal.fire({
+                title: 'Error',
+                text: error.response?.data?.msg || "No se pudo crear el usuario",
+                icon: 'error'
+            });
         }
     };
 
     const eliminarUsuario = async (id) => {
-        if (window.confirm("¿Estás seguro de que quieres eliminar este usuario?")) {
-            try {
+        try {
+            if (id === 1) {
+                Swal.fire({
+                    title: 'Operación no permitida',
+                    text: 'No se puede eliminar el usuario administrador principal',
+                    icon: 'warning',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            const result = await Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Esta acción no se puede deshacer",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (result.isConfirmed) {
                 await axios.delete(`${URL}/usuarios/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
+                
+                Swal.fire(
+                    'Eliminado',
+                    'El usuario ha sido eliminado exitosamente',
+                    'success'
+                );
                 obtenerUsuarios();
-                toast.success("Usuario eliminado exitosamente");
-            } catch (error) {
-                console.error("Error al eliminar usuario:", error);
-                toast.error("No se pudo eliminar el usuario. Por favor, intenta más tarde.");
             }
+        } catch (error) {
+            console.error("Error al eliminar usuario:", error);
+            Swal.fire({
+                title: 'Error',
+                text: error.response?.data?.msg || "No se pudo eliminar el usuario",
+                icon: 'error'
+            });
         }
     };
 
@@ -112,31 +168,90 @@ function Usuario() {
     const actualizarUsuario = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`${URL}/usuarios/${usuarioSeleccionado.id_usuario}`, nuevoUsuario, {
-                headers: { Authorization: `Bearer ${token}` }
+            const result = await Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¿Deseas actualizar este usuario?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, actualizar',
+                cancelButtonText: 'Cancelar'
             });
-            obtenerUsuarios();
-            resetForm();
-            setModoEditar(false);
-            setMostrarModal(false);
-            toast.success("Usuario actualizado exitosamente");
+
+            if (result.isConfirmed) {
+                await axios.put(
+                    `${URL}/usuarios/${usuarioSeleccionado.id_usuario}`, 
+                    nuevoUsuario,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                
+                Swal.fire({
+                    title: 'Éxito',
+                    text: 'Usuario actualizado exitosamente',
+                    icon: 'success',
+                    timer: 1500
+                });
+                
+                obtenerUsuarios();
+                resetForm();
+                setModoEditar(false);
+                setMostrarModal(false);
+            }
         } catch (error) {
             console.error("Error al actualizar usuario:", error);
-            toast.error("No se pudo actualizar el usuario. Por favor, intenta más tarde.");
+            Swal.fire({
+                title: 'Error',
+                text: error.response?.data?.msg || "No se pudo actualizar el usuario",
+                icon: 'error'
+            });
         }
     };
 
     const cambiarEstadoUsuario = async (id, estadoActual) => {
         try {
-            await axios.put(`${URL}/usuarios/${id}/estado`, 
-                { estado_usu: !estadoActual },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            obtenerUsuarios();
-            toast.success("Estado del usuario actualizado exitosamente");
+            if (id === 1) {
+                Swal.fire({
+                    title: 'Operación no permitida',
+                    text: 'No se puede modificar el estado del usuario administrador principal',
+                    icon: 'warning',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            const result = await Swal.fire({
+                title: '¿Estás seguro?',
+                text: `¿Deseas ${estadoActual ? 'desactivar' : 'activar'} este usuario?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: estadoActual ? '#d33' : '#28a745',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: estadoActual ? 'Sí, desactivar' : 'Sí, activar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (result.isConfirmed) {
+                await axios.put(`${URL}/usuarios/${id}/estado`, 
+                    { estado_usu: !estadoActual },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                
+                Swal.fire({
+                    title: 'Éxito',
+                    text: `Usuario ${estadoActual ? 'desactivado' : 'activado'} exitosamente`,
+                    icon: 'success',
+                    timer: 1500
+                });
+                obtenerUsuarios();
+            }
         } catch (error) {
             console.error("Error al cambiar el estado del usuario:", error);
-            toast.error("No se pudo cambiar el estado del usuario. Por favor, intenta más tarde.");
+            Swal.fire({
+                title: 'Error',
+                text: error.response?.data?.msg || "No se pudo cambiar el estado del usuario",
+                icon: 'error'
+            });
         }
     };
 
@@ -164,7 +279,7 @@ function Usuario() {
     };
 
     return (
-        <MainLayout>
+        <div className="s">
             <div className="primero"></div>
             <div className="usuario-header">
                 <h1 className="nombre-pagina">Gestión de Usuarios</h1>
@@ -264,8 +379,8 @@ function Usuario() {
                 </div>
             )}
             <ToastContainer position="top-right" autoClose={3000} />
-        </MainLayout>
-    );
+        </div>
+  );
 }
 
 export default Usuario;
