@@ -33,7 +33,7 @@
 .buscar-bicicleta {
   display: flex;
   align-items: center;
-  margin: 0 20px; /* Espaciado lateral */
+  margin: 0 20px;
   margin-left: 250px;
 
 }
@@ -42,8 +42,8 @@
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  margin-left: 8px; /* Espaciado entre el icono y el input */
-  flex: 1; /* Para que ocupe el espacio disponible */
+  margin-left: 8px;
+  flex: 1;
   width: 350px;
 }
 
@@ -139,6 +139,7 @@
   display: flex;
   gap: 30px;
   margin-bottom: 20px;
+  width: 120%;
 }
 
 .columna {

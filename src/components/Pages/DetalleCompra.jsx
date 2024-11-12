@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 import { 
   FaArrowLeft, 
   FaFileInvoice, 
@@ -13,7 +15,8 @@ import {
   FaFilePdf,
   FaBarcode,
   FaBox,
-  FaShoppingCart
+  FaShoppingCart,
+  FaPrint
 } from 'react-icons/fa';
 import styles from '../styles/detallecompra.module.css';
 
@@ -22,28 +25,117 @@ const URL = import.meta.env.VITE_URL;
 const DetalleCompra = () => {
   const [compra, setCompra] = useState(null);
   const [detalles, setDetalles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { id } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCompra = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${URL}/compras/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setCompra(response.data.compra);
-        setDetalles(response.data.detalles);
-      } catch (error) {
-        console.error('Error al obtener los detalles de la compra:', error);
-        alert('Error al cargar los detalles de la compra');
-      }
-    };
-
     fetchCompra();
   }, [id]);
 
+  const fetchCompra = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        toast.error('No hay sesión activa');
+        navigate('/login');
+        return;
+      }
+
+      const response = await axios.get(`${URL}/compras/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (response.data.ok) {
+        setCompra(response.data.compra);
+        setDetalles(response.data.detalles);
+        toast.success('Detalles de compra cargados');
+      } else {
+        throw new Error('Error al cargar los detalles');
+      }
+    } catch (error) {
+      console.error('Error al obtener los detalles de la compra:', error);
+      setError(error.response?.data?.mensaje || 'Error al cargar los detalles de la compra');
+      toast.error('Error al cargar los detalles de la compra');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePrintPDF = async () => {
+    if (!compra?.pdf) {
+      toast.error('No hay PDF disponible para esta compra');
+      return;
+    }
+
+    try {
+      const pdfUrl = `${URL}${compra.pdf}`;
+      window.open(pdfUrl, '_blank');
+    } catch (error) {
+      console.error('Error al abrir el PDF:', error);
+      toast.error('Error al abrir el PDF');
+    }
+  };
+
+  const handleExportExcel = async () => {
+    try {
+      Swal.fire({
+        title: 'Exportar a Excel',
+        text: '¿Desea exportar los detalles a Excel?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, exportar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Aquí iría la lógica de exportación a Excel
+          toast.info('Función de exportación a Excel en desarrollo');
+        }
+      });
+    } catch (error) {
+      console.error('Error al exportar a Excel:', error);
+      toast.error('Error al exportar a Excel');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
+        <p>Cargando detalles de la compra...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.errorContainer}>
+        <h2>Error al cargar los detalles</h2>
+        <p>{error}</p>
+        <Link to="/ListaCompra" className={styles.backButton}>
+          <FaArrowLeft className={styles.buttonIcon} />
+          Volver a Compras
+        </Link>
+      </div>
+    );
+  }
+
   if (!compra) {
-    return <div className={styles.loadingContainer}>Cargando...</div>;
+    return (
+      <div className={styles.errorContainer}>
+        <h2>Compra no encontrada</h2>
+        <Link to="/ListaCompra" className={styles.backButton}>
+          <FaArrowLeft className={styles.buttonIcon} />
+          Volver a Compras
+        </Link>
+      </div>
+    );
   }
 
   return (
@@ -56,8 +148,20 @@ const DetalleCompra = () => {
         </Link>
         <h1 className={styles.mainTitle}>
           <FaFileInvoice className={styles.titleIcon} />
-          Detalle de Compra
+          Detalle de Compra #{compra.numero_comprobante}
         </h1>
+        <div className={styles.actionButtons}>
+          {compra?.pdf && (
+            <button 
+              onClick={handlePrintPDF}
+              className={styles.pdfButton}
+            >
+              <FaPrint className={styles.buttonIcon} />
+              Imprimir PDF
+            </button>
+          )}
+
+        </div>
       </div>
 
       <div className={styles.contentWrapper}>
@@ -72,28 +176,18 @@ const DetalleCompra = () => {
                 <FaReceipt className={styles.infoIcon} />
                 Nº Comprobante:
               </span>
-              <span className={styles.infoValue}>{compra.numero_comprobante}</span>
-            </div>
-            <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>
-                <FaFileInvoice className={styles.infoIcon} />
-                Tipo de Comprobante:
+              <span className={styles.infoValue}>
+                {compra.tipo_comprobante} {compra.serie}-{compra.numero_comprobante}
               </span>
-              <span className={styles.infoValue}>{compra.tipo_comprobante}</span>
-            </div>
-            <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>
-                <FaBarcode className={styles.infoIcon} />
-                Serie:
-              </span>
-              <span className={styles.infoValue}>{compra.serie}</span>
             </div>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>
                 <FaStore className={styles.infoIcon} />
                 Proveedor:
               </span>
-              <span className={styles.infoValue}>{compra.proveedor_nombre}</span>
+              <span className={styles.infoValue}>
+                {compra.proveedor_nombre}
+              </span>
             </div>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>
@@ -135,8 +229,8 @@ const DetalleCompra = () => {
                 </tr>
               </thead>
               <tbody>
-                {detalles.map((detalle) => (
-                  <tr key={detalle.id_detalle}>
+                {detalles.map((detalle, index) => (
+                  <tr key={`${detalle.id_detalle_compra}-${index}`}>
                     <td>{detalle.codigo_producto}</td>
                     <td>{detalle.nombre_producto}</td>
                     <td>{detalle.tipo_producto}</td>
@@ -147,6 +241,14 @@ const DetalleCompra = () => {
                   </tr>
                 ))}
               </tbody>
+              <tfoot>
+                <tr key="footer-row">
+                  <td colSpan="6" className={styles.totalLabel}>Total:</td>
+                  <td className={styles.totalAmount}>
+                    Q{Number(compra.total_compra).toFixed(2)}
+                  </td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>

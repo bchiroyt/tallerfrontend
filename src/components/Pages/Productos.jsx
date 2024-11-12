@@ -66,6 +66,12 @@ function Productos() {
     const { name, value, files } = e.target;
     if (name === 'imagen') {
       setNuevoProducto({ ...nuevoProducto, [name]: files[0] });
+    } else if (name === 'codigo') {
+      if (!value.startsWith('1')) {
+        toast.error('El código debe comenzar con el número 1');
+        return;
+      }
+      setNuevoProducto({ ...nuevoProducto, [name]: value });
     } else {
       setNuevoProducto({ ...nuevoProducto, [name]: value });
     }
@@ -196,7 +202,14 @@ function Productos() {
                   </div>
                   <div className="form-group">
                     <label htmlFor="codigo">Código</label>
-                    <input type="text" id="codigo" name="codigo" onChange={handleInputChange} required />
+                    <input 
+                      type="text" 
+                      id="codigo" 
+                      name="codigo" 
+                      onChange={handleInputChange} 
+                      placeholder="Debe comenzar con 1"
+                      required 
+                    />
                   </div>
                   <div className="form-group">
                     <label htmlFor="marca">Marca</label>

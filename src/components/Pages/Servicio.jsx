@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import MainLayout from "./MainLayout";
 import "../styles/historial.css"; 
 import actualizarIcon from '../../assets/actualizar1.png';
 import eliminarIcon from '../../assets/eliminar.png';
@@ -11,7 +10,6 @@ function Servicio() {
     const [servicios, setServicios] = useState([]);
     const [servicioFiltrado, setServicioFiltrado] = useState([]);
     const [nuevoServicio, setNuevoServicio] = useState({
-        codigo_servicio: "",
         nombre_bicicleta: "",
         id_cita: "",
         fecha_mantenimiento: "",
@@ -83,7 +81,6 @@ function Servicio() {
         setModoEditar(true);
         setServicioSeleccionado(registro);
         setNuevoServicio({
-            codigo_servicio: registro.codigo_servicio,
             nombre_bicicleta: registro.nombre_bicicleta,
             id_cita: registro.id_cita,
             fecha_mantenimiento: registro.fecha_mantenimiento,
@@ -113,7 +110,6 @@ function Servicio() {
 
     const resetForm = () => {
         setNuevoServicio({
-            codigo_servicio: "",
             nombre_bicicleta: "",
             id_cita: "",
             fecha_mantenimiento: "",
@@ -204,9 +200,8 @@ function Servicio() {
                         <div className="modal-content">
                             <h2>{modoEditar ? "Actualizar Servicio" : "Nuevo Servicio"}</h2>
                             <form onSubmit={modoEditar ? actualizarServicio : crearServicio}>
-                                <input type="text" name="codigo_servicio" value={nuevoServicio.codigo_servicio} onChange={handleInputChange} placeholder="Código Servicio" required />
                                 <input type="text" name="nombre_bicicleta" value={nuevoServicio.nombre_bicicleta} onChange={handleInputChange} placeholder="Bicicleta" required />
-                                <input type="text" name="id_cita" value={nuevoServicio.id_cita} onChange={handleInputChange} placeholder="ID Cita" required />
+                                <input type="text" name="id_cita" value={nuevoServicio.id_cita} onChange={handleInputChange} placeholder="ID Cita (opcional)" />
                                 <input type="date" name="fecha_mantenimiento" value={nuevoServicio.fecha_mantenimiento} onChange={handleInputChange} required />
                                 <input type="text" name="tipo_mantenimiento" value={nuevoServicio.tipo_mantenimiento} onChange={handleInputChange} placeholder="Tipo de Mantenimiento" required />
                                 <input type="text" name="descripcion_trabajos" value={nuevoServicio.descripcion_trabajos} onChange={handleInputChange} placeholder="Descripción de Trabajos" required />

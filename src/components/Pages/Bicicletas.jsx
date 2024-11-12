@@ -67,6 +67,12 @@ function Bicicletas() {
     const { name, value, files } = e.target;
     if (name === 'imagen') {
       setNuevaBicicleta({ ...nuevaBicicleta, [name]: files[0] });
+    } else if (name === 'codigo') {
+      if (!value.startsWith('3')) {
+        toast.error('El código debe comenzar con el número 3');
+        return;
+      }
+      setNuevaBicicleta({ ...nuevaBicicleta, [name]: value });
     } else {
       setNuevaBicicleta({ ...nuevaBicicleta, [name]: value });
     }
@@ -197,7 +203,14 @@ function Bicicletas() {
                   </div>
                   <div className="form-group">
                     <label htmlFor="codigo">Código</label>
-                    <input type="text" id="codigo" name="codigo" onChange={handleInputChange} required />
+                    <input 
+                      type="text" 
+                      id="codigo" 
+                      name="codigo" 
+                      onChange={handleInputChange} 
+                      placeholder="Debe comenzar con 3"
+                      required 
+                    />
                   </div>
                   <div className="form-group">
                     <label htmlFor="marca">Marca</label>

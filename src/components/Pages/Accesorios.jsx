@@ -66,6 +66,12 @@ function Accesorios() {
     const { name, value, files } = e.target;
     if (name === 'imagen') {
       setNuevoAccesorio({ ...nuevoAccesorio, [name]: files[0] });
+    } else if (name === 'codigo_barra') {
+      if (!value.startsWith('2')) {
+        toast.error('El código debe comenzar con el número 2');
+        return;
+      }
+      setNuevoAccesorio({ ...nuevoAccesorio, [name]: value });
     } else {
       setNuevoAccesorio({ ...nuevoAccesorio, [name]: value });
     }
@@ -196,7 +202,14 @@ function Accesorios() {
                   </div>
                   <div className="form-group">
                     <label htmlFor="codigo_barra">Código de Barra</label>
-                    <input type="text" id="codigo_barra" name="codigo_barra" onChange={handleInputChange} required />
+                    <input 
+                      type="text" 
+                      id="codigo_barra" 
+                      name="codigo_barra" 
+                      onChange={handleInputChange} 
+                      placeholder="Debe comenzar con 2"
+                      required 
+                    />
                   </div>
                   <div className="form-group">
                     <label htmlFor="talla">Talla</label>
