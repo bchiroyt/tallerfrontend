@@ -173,7 +173,7 @@
   background: #fde68a;
 }
 
-/* Modal Styles */
+
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -287,7 +287,7 @@
   background: #dc2626;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
   .headerSection {
     flex-direction: column;

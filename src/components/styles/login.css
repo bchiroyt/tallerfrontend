@@ -1,4 +1,3 @@
-/* Pantalla de carga */
 .loading-screen {
     display: flex;
     flex-direction: column;
@@ -9,7 +8,7 @@
     text-align: center;
   }
   
-  /* Animación del logo */
+ 
   .logo.react {
     height: 40vmin;
     pointer-events: none;
@@ -31,13 +30,13 @@
     }
   }
   
-  /* Estilos de contenedor del login centrado */
+
   .login-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Altura de toda la ventana para centrar verticalmente */
+    height: 100vh; 
     width: 100vw;
   }
   

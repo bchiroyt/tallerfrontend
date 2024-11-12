@@ -94,7 +94,7 @@ const DetalleCompra = () => {
         cancelButtonText: 'Cancelar'
       }).then((result) => {
         if (result.isConfirmed) {
-          // Aquí iría la lógica de exportación a Excel
+        
           toast.info('Función de exportación a Excel en desarrollo');
         }
       });
@@ -200,7 +200,6 @@ const DetalleCompra = () => {
             </div>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>
-                <FaDollarSign className={styles.infoIcon} />
                 Total:
               </span>
               <span className={styles.infoValue}>

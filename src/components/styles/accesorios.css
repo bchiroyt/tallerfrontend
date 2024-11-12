@@ -33,7 +33,7 @@
 .buscar-accesorio {
   display: flex;
   align-items: center;
-  margin: 0 20px; /* Espaciado lateral */
+  margin: 0 20px; 
   margin-left: 230px;
 }
 
@@ -41,8 +41,8 @@
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  margin-left: 8px; /* Espaciado entre el icono y el input */
-  flex: 1; /* Para que ocupe el espacio disponible */
+  margin-left: 8px;
+  flex: 1; 
   width: 350px;
 }
 
@@ -52,7 +52,7 @@
 }
 
 .ordenar select {
-  margin-left: 10px; /* Espaciado entre el select y el icono */
+  margin-left: 10px; 
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -84,8 +84,8 @@
 
 .accesorio-image {
   display: flex;
-  justify-content: center; /* Centrar horizontalmente */
-  align-items: center; /* Centrar verticalmente */
+  justify-content: center; 
+  align-items: center; 
   height: 17vh;
   overflow: hidden;
 }

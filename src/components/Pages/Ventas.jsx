@@ -39,7 +39,7 @@ export default function Ventas() {
       }
     } catch {
       toast.error('No hay una caja abierta');
-      // Redirigir a la página de gestión de caja
+     
       navigate('/GestionCaja');
     }
   };
@@ -238,12 +238,12 @@ export default function Ventas() {
       if (response.data.ok) {
         toast.success('Venta realizada con éxito');
         
-        // Abrir el PDF en una nueva ventana
+        
         if (response.data.venta.pdf_url) {
           window.open(`${URL}${response.data.venta.pdf_url}`, '_blank');
         }
         
-        // Limpiar el carrito y otros estados
+        
         setCarrito([]);
         setCliente(null);
         setMontoRecibido('');

@@ -188,7 +188,6 @@
   font-size: 1.25rem;
 }
 
-/* Estilos para filas alternas */
 .detallesTable tbody tr:nth-child(even) {
   background: #f8fafc;
 }

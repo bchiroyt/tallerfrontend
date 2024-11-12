@@ -1,5 +1,5 @@
 .main-content {
-  margin-left: 250px; /* Para evitar que el contenido esté encima de la barra */
+  margin-left: 250px; 
   padding: 20px;
 }
 
@@ -22,7 +22,7 @@ th, td {
 }
 
 th {
-  background-color: #4CAF50; /* Verde */
+  background-color: #4CAF50; 
   color: white;
 }
 

@@ -86,7 +86,7 @@
   color: #333;
 }
 
-/* Estilos para la sección de pago */
+
 .posPaymentSection {
   background: #f8f9fa;
   border-radius: 12px;
@@ -283,7 +283,7 @@
   max-height: 300px;
   }
   }
-  /* Estilos para el modal de cliente */
+
   .modalOverlay {
   position: fixed;
   top: 0;

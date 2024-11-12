@@ -5,8 +5,7 @@ import {
   FaPlus, 
   FaReceipt, 
   FaStore, 
-  FaCalendarAlt, 
-  FaDollarSign, 
+  FaCalendarAlt,
   FaCog,
   FaEye 
 } from 'react-icons/fa';
@@ -65,7 +64,7 @@ const ListaCompras = () => {
                 Fecha
               </th>
               <th>
-                <FaDollarSign className={styles.headerIcon} />
+                <span className={styles.headerIcon}>Q</span>
                 Total
               </th>
               <th>

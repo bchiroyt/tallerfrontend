@@ -255,7 +255,7 @@
   display: inline-block;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
   .reembolsoContainer {
     padding: 1rem;

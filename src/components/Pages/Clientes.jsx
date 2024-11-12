@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
-import styles from '../styles/cliente.module.css'; // Cambia a CSS Modules
+import { FaPlus, FaEdit } from 'react-icons/fa';
+import styles from '../styles/cliente.module.css';
 
 function Cliente() {
     const [clientes, setClientes] = useState([]);

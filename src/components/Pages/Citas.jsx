@@ -59,7 +59,7 @@ function Citas() {
             const response = await axios.get(`${URL}/usuarios`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setTecnicos(response.data.usuarios); // Asegúrate de que esto esté configurado correctamente
+            setTecnicos(response.data.usuarios); 
         } catch (error) {
             console.error("Error al obtener técnicos:", error);
             toast.error("No se pudieron obtener los técnicos.");

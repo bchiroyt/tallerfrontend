@@ -117,7 +117,7 @@
   margin-right: 10px;
 }
 
-/* Estilos adicionales para el formulario en el modal */
+
 .modal-content form {
   display: flex;
   flex-direction: column;
@@ -130,7 +130,7 @@
   border-radius: 4px;
 }
 
-/* Responsive design */
+
 @media (max-width: 768px) {
   .usuario-header {
     flex-direction: column;

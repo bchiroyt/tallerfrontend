@@ -10,7 +10,6 @@ function ConsultaCompra() {
     const [fechaInicio, setFechaInicio] = useState('');
     const [fechaFin, setFechaFin] = useState('');
     const [mostrarDetalles, setMostrarDetalles] = useState(false);
-    const [detallesCompra, setDetallesCompra] = useState([]);
 
     const token = localStorage.getItem("token");
     const URL = import.meta.env.VITE_URL;
@@ -32,22 +31,6 @@ function ConsultaCompra() {
             Swal.fire({
                 title: 'Error',
                 text: error.response?.data?.msg || 'Error al obtener las compras',
-                icon: 'error'
-            });
-        }
-    };
-
-    const verDetalles = async (idCompra) => {
-        try {
-            const response = await axios.get(`${URL}/consultas/compras/${idCompra}/detalles`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setDetallesCompra(response.data.detalles);
-            setMostrarDetalles(true);
-        } catch {
-            Swal.fire({
-                title: 'Error',
-                text: 'Error al obtener los detalles',
                 icon: 'error'
             });
         }

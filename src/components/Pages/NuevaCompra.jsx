@@ -93,10 +93,10 @@ export default function NuevaCompra() {
   }, [busqueda, productoActual.tipo_producto]);
 
   const seleccionarProducto = (producto) => {
-    // Obtener el precio de venta según el tipo de producto
+    
     const precioVenta = producto.precio_venta || producto.precio || 0;
     
-    // Obtener el ID según el tipo de producto
+    
     let idProducto;
     switch (productoActual.tipo_producto) {
       case 'accesorio':
@@ -112,22 +112,22 @@ export default function NuevaCompra() {
         idProducto = '';
     }
 
-    // Actualizar el estado del producto actual con todos los datos
+   
     setProductoActual({
       ...productoActual,
       id_producto: idProducto,
       nombre: producto.nombre,
       precio_unitario: producto.precio_costo || producto.precio_compra || 0,
       precio_venta: precioVenta,
-      cantidad: 1, // Mantener en 1 por defecto
+      cantidad: 1, 
       seleccionado: true,
       codigo: producto.codigo || producto.codigo_barra || ''
     });
 
-    // Mostrar notificación de éxito
+    
     toast.success(`${producto.nombre} seleccionado`);
 
-    // Limpiar la búsqueda y resultados
+    
     setBusqueda('');
     setResultadosBusqueda([]);
   };
@@ -163,7 +163,7 @@ export default function NuevaCompra() {
       }]
     }));
 
-    // Resetear producto actual
+    
     setProductoActual({
       tipo_producto: 'accesorio',
       id_producto: '',
@@ -206,10 +206,10 @@ export default function NuevaCompra() {
   };
 
   const guardarCompra = async () => {
-    // Agregar logs para debug
+    
     console.log('Datos de la compra a enviar:', compra);
     
-    // Validaciones
+    
     if (!compra.id_proveedor) {
       toast.warning('Debe seleccionar un proveedor');
       return;
@@ -240,7 +240,7 @@ export default function NuevaCompra() {
       if (result.isConfirmed) {
         const token = localStorage.getItem('token');
         
-        // Formatear los detalles antes de enviar
+       
         const compraFormateada = {
           ...compra,
           detalles: compra.detalles.map(detalle => ({
@@ -265,7 +265,7 @@ export default function NuevaCompra() {
         if (response.data.ok) {
           toast.success('Compra registrada exitosamente');
           
-          // Abrir PDF en nueva ventana si existe
+          
           if (response.data.compra?.pdf) {
             const pdfUrl = `${URL}${response.data.compra.pdf}`;
             window.open(pdfUrl, '_blank');
