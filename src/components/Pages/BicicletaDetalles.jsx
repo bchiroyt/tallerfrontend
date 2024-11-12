@@ -5,7 +5,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/bicidetalle.css';
 import actualizarIcon from '../../assets/actualizar1.png';
-import eliminarIcon from '../../assets/eliminar.png';
 
 function BicicletaDetalles() {
   const { id } = useParams();
@@ -165,7 +164,6 @@ function BicicletaDetalles() {
       </div>
       <div className="acciones-container">
         <img src={actualizarIcon} alt="Actualizar" onClick={() => setEditando(true)} className="accion-icon" />
-        <img src={eliminarIcon} alt="Eliminar" onClick={() => setMostrarConfirmacion(true)} className="accion-icon" />
         <button onClick={toggleEstado} 
                 className={`estado-toggle ${bicicleta.estado ? 'activo' : 'inactivo'}`}>
           {bicicleta.estado ? 'Desactivar' : 'Activar'}

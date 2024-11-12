@@ -6,6 +6,7 @@ import '../styles/categoria.css';
 import actualizarIcon from '../../assets/actualizar1.png';
 import eliminarIcon from '../../assets/eliminar.png';
 import activarIcon from '../../assets/switch.png';
+import Swal from 'sweetalert2';
 
 function Categoria() {
     const [categorias, setCategorias] = useState([]);
@@ -70,20 +71,51 @@ function Categoria() {
             });
     };
 
-    const eliminarCategoria = (id) => {
-        axios.delete(`${URL}/categorias/${id}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        })
-            .then(() => {
-                obtenerCategorias();
-                toast.success("Categoría eliminada exitosamente");
-            })
-            .catch((error) => {
-                console.error("Error al eliminar categoría:", error);
-                toast.error("No se pudo eliminar la categoría. Por favor, intenta más tarde.");
+    const eliminarCategoria = async (id) => {
+        try {
+            if (id === 1) {
+                Swal.fire({
+                    title: 'Operación no permitida',
+                    text: 'No se puede eliminar la categoría por defecto',
+                    icon: 'warning',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            const confirmacion = await Swal.fire({
+                title: '¿Estás seguro?',
+                text: 'Los items relacionados serán movidos a la categoría por defecto. Esta acción no se puede deshacer.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
             });
+
+            if (confirmacion.isConfirmed) {
+                const response = await axios.delete(`${URL}/categorias/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                obtenerCategorias();
+                Swal.fire({
+                    title: 'Éxito',
+                    text: response.data.msg,
+                    icon: 'success',
+                    timer: 3000
+                });
+            }
+        } catch (error) {
+            console.error("Error al eliminar categoría:", error);
+            Swal.fire({
+                title: 'Error',
+                text: error.response?.data?.msg || "No se pudo eliminar la categoría",
+                icon: 'error'
+            });
+        }
     };
 
     const seleccionarCategoria = (categoria) => {
@@ -134,32 +166,53 @@ function Categoria() {
         );
     };
 
-    const toggleEstadoCategoria = (categoria) => {
-        setCategoriaParaActivar(categoria);
-        setMostrarConfirmacion(true);
-    };
+    const toggleEstadoCategoria = async (categoria) => {
+        try {
+            const nuevoEstado = !categoria.estado_cat;
+            
+            const confirmacion = await Swal.fire({
+                title: 'Confirmar acción',
+                text: nuevoEstado 
+                    ? '¿Estás seguro de activar esta categoría? Esto también activará todos los productos, accesorios y bicicletas relacionados.' 
+                    : '¿Estás seguro de desactivar esta categoría? Esto también desactivará todos los productos, accesorios y bicicletas relacionados.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: nuevoEstado ? '#28a745' : '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: nuevoEstado ? 'Sí, activar todo' : 'Sí, desactivar todo',
+                cancelButtonText: 'Cancelar'
+            });
 
-    const confirmarToggleEstado = () => {
-        if (categoriaParaActivar) {
-            const nuevoEstado = !categoriaParaActivar.estado_cat;
-            axios.put(`${URL}/categorias/${categoriaParaActivar.id_categoria}`, 
-                { ...categoriaParaActivar, estado_cat: nuevoEstado },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            )
-                .then(() => {
+            if (confirmacion.isConfirmed) {
+                const response = await axios.patch(
+                    `${URL}/categorias/${categoria.id_categoria}/estado`,
+                    { estado_cat: nuevoEstado },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        }
+                    }
+                );
+
+                if (response.data.ok) {
                     obtenerCategorias();
-                    toast.success(`Categoría ${nuevoEstado ? 'activada' : 'desactivada'} exitosamente`);
-                })
-                .catch((error) => {
-                    console.error("Error al cambiar el estado de la categoría:", error);
-                    toast.error("No se pudo cambiar el estado de la categoría. Por favor, intenta más tarde.");
-                });
+                    Swal.fire({
+                        title: 'Éxito',
+                        text: response.data.msg,
+                        icon: 'success',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                }
+            }
+        } catch (error) {
+            console.error("Error al cambiar estado:", error);
+            Swal.fire({
+                title: 'Error',
+                text: error.response?.data?.msg || 'Error al cambiar el estado de la categoría',
+                icon: 'error'
+            });
         }
-        setMostrarConfirmacion(false);
     };
 
     return (
