@@ -116,7 +116,7 @@ function Sidebar({ visible, onToggle }) {
           <li>
             <a>Ayuda</a>
             <ul className="submenu">
-              <li onClick={() => handleNavigation("#")}>Manual de Usuario</li>
+              <li onClick={() => handleNavigation("/Manual")}>Manual de Usuario</li>
             </ul>
           </li>
         )}
