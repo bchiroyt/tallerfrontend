@@ -130,6 +130,16 @@
   border-radius: 4px;
 }
 
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-help {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
 
 @media (max-width: 768px) {
   .usuario-header {

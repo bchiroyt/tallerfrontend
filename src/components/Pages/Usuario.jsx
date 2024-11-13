@@ -60,11 +60,28 @@ function Usuario() {
     }, [obtenerUsuarios, obtenerRoles]);
 
     const handleInputChange = (e) => {
-        setNuevoUsuario({ ...nuevoUsuario, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setNuevoUsuario(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const validarFormulario = () => {
+        if (!modoEditar && nuevoUsuario.password.length < 8) {
+            toast.error('La contraseña debe tener al menos 8 caracteres');
+            return false;
+        }
+        if (modoEditar && nuevoUsuario.password && nuevoUsuario.password.length < 8) {
+            toast.error('La contraseña debe tener al menos 8 caracteres');
+            return false;
+        }
+        return true;
     };
 
     const crearUsuario = async (e) => {
         e.preventDefault();
+        if (!validarFormulario()) return;
         try {
             const result = await Swal.fire({
                 title: '¿Estás seguro?',
@@ -84,29 +101,29 @@ function Usuario() {
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 
-                Swal.fire({
-                    title: 'Éxito',
-                    text: 'Usuario creado exitosamente',
-                    icon: 'success',
-                    timer: 1500
-                });
-                
+                toast.success('Usuario creado exitosamente');
                 obtenerUsuarios();
                 resetForm();
                 setMostrarModal(false);
             }
         } catch (error) {
             console.error("Error al crear usuario:", error);
-            Swal.fire({
-                title: 'Error',
-                text: error.response?.data?.msg || "No se pudo crear el usuario",
-                icon: 'error'
-            });
+            toast.error(error.response?.data?.msg || "Error al crear el usuario");
         }
     };
 
     const eliminarUsuario = async (id) => {
         try {
+            if (id === 0) {
+                Swal.fire({
+                    title: 'Operación no permitida',
+                    text: 'No se puede eliminar el usuario del sistema',
+                    icon: 'warning',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
             if (id === 1) {
                 Swal.fire({
                     title: 'Operación no permitida',
@@ -119,7 +136,7 @@ function Usuario() {
 
             const result = await Swal.fire({
                 title: '¿Estás seguro?',
-                text: "Esta acción no se puede deshacer",
+                text: "Esta acción transferirá todas las operaciones al usuario del sistema y eliminará este usuario permanentemente",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -133,20 +150,12 @@ function Usuario() {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 
-                Swal.fire(
-                    'Eliminado',
-                    'El usuario ha sido eliminado exitosamente',
-                    'success'
-                );
+                toast.success('Usuario eliminado exitosamente');
                 obtenerUsuarios();
             }
         } catch (error) {
             console.error("Error al eliminar usuario:", error);
-            Swal.fire({
-                title: 'Error',
-                text: error.response?.data?.msg || "No se pudo eliminar el usuario",
-                icon: 'error'
-            });
+            toast.error(error.response?.data?.msg || "Error al eliminar el usuario");
         }
     };
 
@@ -157,10 +166,10 @@ function Usuario() {
             nombre: usuario.nombre,
             apellido: usuario.apellido,
             email: usuario.email,
-            password: "",
-            telefono: usuario.telefono,
-            direccion: usuario.direccion,
-            id_rol: usuario.id_rol,
+            password: '', 
+            telefono: usuario.telefono || '',
+            direccion: usuario.direccion || '',
+            id_rol: usuario.id_rol.toString(),
         });
         setMostrarModal(true);
     };
@@ -168,6 +177,25 @@ function Usuario() {
     const actualizarUsuario = async (e) => {
         e.preventDefault();
         try {
+            if (usuarioSeleccionado.id_usuario === 0) {
+                Swal.fire({
+                    title: 'Operación no permitida',
+                    text: 'No se puede modificar el usuario del sistema',
+                    icon: 'warning',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            const datosActualizados = {};
+            if (nuevoUsuario.nombre) datosActualizados.nombre = nuevoUsuario.nombre;
+            if (nuevoUsuario.apellido) datosActualizados.apellido = nuevoUsuario.apellido;
+            if (nuevoUsuario.email) datosActualizados.email = nuevoUsuario.email;
+            if (nuevoUsuario.password) datosActualizados.password = nuevoUsuario.password;
+            if (nuevoUsuario.telefono) datosActualizados.telefono = nuevoUsuario.telefono;
+            if (nuevoUsuario.direccion) datosActualizados.direccion = nuevoUsuario.direccion;
+            if (nuevoUsuario.id_rol) datosActualizados.id_rol = nuevoUsuario.id_rol;
+
             const result = await Swal.fire({
                 title: '¿Estás seguro?',
                 text: "¿Deseas actualizar este usuario?",
@@ -182,17 +210,11 @@ function Usuario() {
             if (result.isConfirmed) {
                 await axios.put(
                     `${URL}/usuarios/${usuarioSeleccionado.id_usuario}`, 
-                    nuevoUsuario,
+                    datosActualizados,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 
-                Swal.fire({
-                    title: 'Éxito',
-                    text: 'Usuario actualizado exitosamente',
-                    icon: 'success',
-                    timer: 1500
-                });
-                
+                toast.success('Usuario actualizado exitosamente');
                 obtenerUsuarios();
                 resetForm();
                 setModoEditar(false);
@@ -200,16 +222,22 @@ function Usuario() {
             }
         } catch (error) {
             console.error("Error al actualizar usuario:", error);
-            Swal.fire({
-                title: 'Error',
-                text: error.response?.data?.msg || "No se pudo actualizar el usuario",
-                icon: 'error'
-            });
+            toast.error(error.response?.data?.msg || "Error al actualizar el usuario");
         }
     };
 
     const cambiarEstadoUsuario = async (id, estadoActual) => {
         try {
+            if (id === 0) {
+                Swal.fire({
+                    title: 'Operación no permitida',
+                    text: 'No se puede modificar el estado del usuario del sistema',
+                    icon: 'warning',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
             if (id === 1) {
                 Swal.fire({
                     title: 'Operación no permitida',
@@ -237,21 +265,12 @@ function Usuario() {
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 
-                Swal.fire({
-                    title: 'Éxito',
-                    text: `Usuario ${estadoActual ? 'desactivado' : 'activado'} exitosamente`,
-                    icon: 'success',
-                    timer: 1500
-                });
+                toast.success(`Usuario ${estadoActual ? 'desactivado' : 'activado'} exitosamente`);
                 obtenerUsuarios();
             }
         } catch (error) {
             console.error("Error al cambiar el estado del usuario:", error);
-            Swal.fire({
-                title: 'Error',
-                text: error.response?.data?.msg || "No se pudo cambiar el estado del usuario",
-                icon: 'error'
-            });
+            toast.error(error.response?.data?.msg || "Error al cambiar el estado del usuario");
         }
     };
 
@@ -359,13 +378,36 @@ function Usuario() {
                             <input type="text" name="nombre" value={nuevoUsuario.nombre} onChange={handleInputChange} placeholder="Nombre" required />
                             <input type="text" name="apellido" value={nuevoUsuario.apellido} onChange={handleInputChange} placeholder="Apellido" required />
                             <input type="email" name="email" value={nuevoUsuario.email} onChange={handleInputChange} placeholder="Email" required />
-                            <input type="password" name="password" value={nuevoUsuario.password} onChange={handleInputChange} placeholder="Contraseña" />
+                            <div className="input-group">
+                                <input 
+                                    type="password" 
+                                    name="password" 
+                                    value={nuevoUsuario.password} 
+                                    onChange={handleInputChange} 
+                                    placeholder="Contraseña" 
+                                    {...(modoEditar ? {} : { required: true })}
+                                />
+                                <small className="input-help">
+                                    {modoEditar ? 
+                                        "Dejar en blanco para mantener la contraseña actual (mínimo 8 caracteres si se modifica)" :
+                                        "La contraseña debe tener al menos 8 caracteres"
+                                    }
+                                </small>
+                            </div>
                             <input type="text" name="telefono" value={nuevoUsuario.telefono} onChange={handleInputChange} placeholder="Teléfono" />
                             <input type="text" name="direccion" value={nuevoUsuario.direccion} onChange={handleInputChange} placeholder="Dirección" />
-                            <select name="id_rol" value={nuevoUsuario.id_rol} onChange={handleInputChange} required>
+                            <select 
+                                name="id_rol" 
+                                value={nuevoUsuario.id_rol} 
+                                onChange={handleInputChange} 
+                                required
+                            >
                                 <option value="">Seleccione un rol</option>
                                 {roles.map((rol) => (
-                                    <option key={rol.id_rol} value={rol.id_rol}>
+                                    <option 
+                                        key={rol.id_rol} 
+                                        value={rol.id_rol.toString()}
+                                    >
                                         {rol.nombre}
                                     </option>
                                 ))}
