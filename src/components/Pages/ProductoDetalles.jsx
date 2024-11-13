@@ -22,6 +22,14 @@ function ProductoDetalles() {
     obtenerCategorias();
   }, [id]);
 
+  useEffect(() => {
+    return () => {
+      if (imagenPreview) {
+        window.URL.revokeObjectURL(imagenPreview);
+      }
+    };
+  }, [imagenPreview]);
+
   const obtenerProducto = async () => {
     try {
       const response = await axios.get(`${URL}/productos/${id}`, {
@@ -49,11 +57,18 @@ function ProductoDetalles() {
     const { name, value, files } = e.target;
     if (name === 'imagen') {
       if (files && files[0]) {
-        setProducto({ ...producto, [name]: files[0] });
-        setImagenPreview(URL.createObjectURL(files[0]));
+        const file = files[0];
+        setProducto(prev => ({
+          ...prev,
+          [name]: file
+        }));
+        setImagenPreview(window.URL.createObjectURL(file));
       }
     } else {
-      setProducto({ ...producto, [name]: value });
+      setProducto(prev => ({
+        ...prev,
+        [name]: value
+      }));
     }
   };
 
@@ -64,7 +79,7 @@ function ProductoDetalles() {
         if (producto[key] instanceof File) {
           formData.append(key, producto[key]);
         }
-      } else {
+      } else if (key !== 'nombre_categoria' && key !== 'imagenPreview') {
         formData.append(key, producto[key]);
       }
     }
@@ -76,10 +91,19 @@ function ProductoDetalles() {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-      toast.success('Producto actualizado exitosamente');
-      setEditando(false);
-      setProducto(response.data.producto);
-      setImagenPreview(null);
+
+      if (response.data.ok) {
+        const productoActualizado = await axios.get(`${URL}/productos/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        setProducto(productoActualizado.data.producto);
+        setEditando(false);
+        setImagenPreview(null);
+        toast.success('Producto actualizado exitosamente');
+      }
     } catch (error) {
       console.error('Error al actualizar el producto:', error);
       toast.error('Error al actualizar el producto');

@@ -20,7 +20,7 @@ function Accesorios() {
     precio_costo: '',
     precio_venta: '',
     stock: '',
-    estado: 'activo',
+    estado_acce: true,
     imagen: null
   });
   const [busqueda, setBusqueda] = useState('');
@@ -35,7 +35,11 @@ function Accesorios() {
   }, []);
 
   useEffect(() => {
-    filtrarYOrdenarAccesorios();
+    if (accesorios && accesorios.length > 0) {
+      filtrarYOrdenarAccesorios();
+    } else {
+      setAccesoriosFiltrados([]);
+    }
   }, [accesorios, busqueda, categoriaSeleccionada, ordenarPor, ordenAscendente]);
 
   const obtenerAccesorios = async () => {
@@ -79,40 +83,64 @@ function Accesorios() {
 
   const crearAccesorio = async (e) => {
     e.preventDefault();
+    
     const formData = new FormData();
+    
+    // Validar y agregar cada campo al FormData
     for (const key in nuevoAccesorio) {
-      formData.append(key, nuevoAccesorio[key]);
+      // No validar imagen como campo requerido
+      if (nuevoAccesorio[key] === '' && 
+          key !== 'talla' && 
+          key !== 'material' && 
+          key !== 'imagen') {
+        toast.error(`El campo ${key} es requerido`);
+        return;
+      }
+      // Solo agregar la imagen si existe
+      if (key === 'imagen' && nuevoAccesorio[key]) {
+        formData.append(key, nuevoAccesorio[key]);
+      } else if (key !== 'imagen') {
+        formData.append(key, nuevoAccesorio[key]);
+      }
     }
+
     try {
-      await axios.post(`${URL}/accesorios`, formData, {
+      const response = await axios.post(`${URL}/accesorios`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-      toast.success('Accesorio creado exitosamente');
-      setMostrarModal(false);
-      obtenerAccesorios();
+      
+      if (response.data.ok) {
+        toast.success('Accesorio creado exitosamente');
+        setMostrarModal(false);
+        obtenerAccesorios();
+      }
     } catch (error) {
-      toast.error('Error al crear el accesorio');
-      console.error(error);
+      console.error('Error completo:', error);
+      toast.error(error.response?.data?.msg || 'Error al crear el accesorio');
     }
   };
 
   const filtrarYOrdenarAccesorios = () => {
     let accesoriosFiltrados = accesorios.filter(accesorio =>
-      (accesorio.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-      accesorio.codigo_barra.toLowerCase().includes(busqueda.toLowerCase())) &&
+      (accesorio.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
+      accesorio.codigo_barra?.toLowerCase().includes(busqueda.toLowerCase())) &&
       (categoriaSeleccionada ? accesorio.id_categoria === parseInt(categoriaSeleccionada) : true)
     );
 
     accesoriosFiltrados.sort((a, b) => {
       if (ordenarPor === 'id') {
-        return ordenAscendente ? a.id_accesorio - b.id_accesorio : b.id_accesorio - a.id_accesorio;
+        return ordenAscendente ? 
+          (a.id_accesorio || 0) - (b.id_accesorio || 0) : 
+          (b.id_accesorio || 0) - (a.id_accesorio || 0);
       } else if (ordenarPor === 'nombre') {
+        const nombreA = a.nombre || '';
+        const nombreB = b.nombre || '';
         return ordenAscendente
-          ? a.nombre.localeCompare(b.nombre)
-          : b.nombre.localeCompare(a.nombre);
+          ? nombreA.localeCompare(nombreB)
+          : nombreB.localeCompare(nombreA);
       }
       return 0;
     });

@@ -48,24 +48,39 @@ function AccesorioDetalles() {
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
+    
     if (name === 'imagen') {
-      if (files && files[0]) {
-        setAccesorio({ ...accesorio, [name]: files[0] });
-        setImagenPreview(URL.createObjectURL(files[0]));
+      const file = files[0];
+      if (file) {
+        try {
+          const imageUrl = window.URL.createObjectURL(file);
+          setImagenPreview(imageUrl);
+          setAccesorio(prev => ({ ...prev, [name]: file }));
+        } catch (error) {
+          console.error('Error al crear URL para la imagen:', error);
+          toast.error('Error al procesar la imagen');
+        }
       }
+    } else if (name === 'codigo_barra') {
+      if (!value.startsWith('2')) {
+        toast.error('El código debe comenzar con el número 2');
+        return;
+      }
+      setAccesorio(prev => ({ ...prev, [name]: value }));
     } else {
-      setAccesorio({ ...accesorio, [name]: value });
+      setAccesorio(prev => ({ ...prev, [name]: value }));
     }
   };
 
-  const actualizarAccesorio = async () => {
+  const actualizarAccesorio = async (e) => {
+    e.preventDefault();
+    
     const formData = new FormData();
+    
     for (const key in accesorio) {
-      if (key === 'imagen') {
-        if (accesorio[key] instanceof File) {
-          formData.append(key, accesorio[key]);
-        }
-      } else {
+      if (key === 'imagen' && accesorio[key] instanceof File) {
+        formData.append(key, accesorio[key]);
+      } else if (key !== 'imagen' && key !== 'nombre_categoria') {
         formData.append(key, accesorio[key]);
       }
     }
@@ -77,13 +92,21 @@ function AccesorioDetalles() {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-      toast.success('Accesorio actualizado exitosamente');
-      setEditando(false);
-      setAccesorio(response.data.accesorio);
-      setImagenPreview(null);
+
+      if (response.data.ok) {
+        const accesorioActualizado = await axios.get(`${URL}/accesorios/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        setAccesorio(accesorioActualizado.data.accesorio);
+        setEditando(false);
+        toast.success('Accesorio actualizado exitosamente');
+      }
     } catch (error) {
-      console.error('Error al actualizar el accesorio:', error);
-      toast.error('Error al actualizar el accesorio');
+      console.error('Error completo:', error);
+      toast.error(error.response?.data?.msg || 'Error al actualizar el accesorio');
     }
   };
 
@@ -113,6 +136,15 @@ function AccesorioDetalles() {
     }
   };
 
+  useEffect(() => {
+    // Limpiar la URL de la imagen preview cuando el componente se desmonte
+    return () => {
+      if (imagenPreview) {
+        window.URL.revokeObjectURL(imagenPreview);
+      }
+    };
+  }, [imagenPreview]);
+
   if (!accesorio) return <div>Cargando...</div>;
 
   return (
@@ -124,7 +156,7 @@ function AccesorioDetalles() {
         <img src={imagenPreview || `${URL}${accesorio.imagen}`} alt={accesorio.nombre} className="accesorio-imagen" />
         <div className="accesorio-info">
           {editando ? (
-            <form onSubmit={(e) => { e.preventDefault(); actualizarAccesorio(); }}>
+            <form onSubmit={(e) => { e.preventDefault(); actualizarAccesorio(e); }}>
               <input type="text" name="nombre" value={accesorio.nombre} onChange={handleInputChange} required />
               <input type="text" name="codigo_barra" value={accesorio.codigo_barra} onChange={handleInputChange} required />
               <input type="text" name="material" value={accesorio.material} onChange={handleInputChange} />

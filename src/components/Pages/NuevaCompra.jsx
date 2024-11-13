@@ -1,14 +1,25 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import Swal from 'sweetalert2';
 import { 
-  FaStore, FaCalendarAlt, FaListAlt, FaBarcode, FaBox,
-  FaSearch, FaPlus, FaTrash, FaSave, FaTimes,
-  FaReceipt, FaFileInvoice, FaMoneyBillWave  
+  FaStore,
+  FaCalendarAlt,
+  FaListAlt,
+  FaBarcode,
+  FaBox,
+  FaSearch,
+  FaPlus,
+  FaTrash,
+  FaSave,
+  FaTimes,
+  FaReceipt,
+  FaFileInvoice,
+  FaMoneyBillWave  
 } from 'react-icons/fa';
 import styles from '../styles/nuevacompra.module.css';
+import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
+
 
 const URL = import.meta.env.VITE_URL;
 
@@ -46,7 +57,6 @@ export default function NuevaCompra() {
       setProveedores(response.data.proveedores);
     } catch (error) {
       console.error('Error al cargar proveedores:', error);
-      toast.error('No se pudieron cargar los proveedores');
     }
   };
 
@@ -55,7 +65,21 @@ export default function NuevaCompra() {
   };
 
   const handleProductoChange = (e) => {
-    setProductoActual({ ...productoActual, [e.target.name]: e.target.value });
+    if (e.target.name === 'tipo_producto') {
+      setProductoActual({
+        tipo_producto: e.target.value,
+        id_producto: '',
+        cantidad: 1,
+        precio_unitario: 0,
+        precio_venta: 0,
+        nombre: '',
+        seleccionado: false
+      });
+      setBusqueda('');
+      setResultadosBusqueda([]);
+    } else {
+      setProductoActual({ ...productoActual, [e.target.name]: e.target.value });
+    }
   };
 
   const buscarProducto = async () => {
@@ -70,100 +94,185 @@ export default function NuevaCompra() {
       });
       
       let resultados = [];
-      if (response.data.ok) {
-        resultados = response.data[productoActual.tipo_producto] ? [response.data[productoActual.tipo_producto]] : [];
+      if (response.data.ok && response.data[productoActual.tipo_producto]) {
+        const producto = response.data[productoActual.tipo_producto];
+        const productoId = producto.id_producto || producto.id;
+        
+        if (!resultados.some(item => (item.id_producto || item.id) === productoId)) {
+          resultados.push(producto);
+        }
       }
       
       setResultadosBusqueda(resultados);
     } catch (error) {
       console.error('Error al buscar productos:', error);
-      toast.error('Error al buscar productos');
+      toast.error('Error al buscar productos', {
+        position: "top-right",
+        autoClose: 3000
+      });
       setResultadosBusqueda([]);
     }
   };
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      if (busqueda.trim()) {
+      if (busqueda.trim().length >= 2) {
         buscarProducto();
+      } else {
+        setResultadosBusqueda([]);
       }
-    }, 300);
+    }, 500);
 
     return () => clearTimeout(delayDebounceFn);
   }, [busqueda, productoActual.tipo_producto]);
 
   const seleccionarProducto = (producto) => {
+    console.log('Producto seleccionado:', producto);
     
-    const precioVenta = producto.precio_venta || producto.precio || 0;
+    // Verificar si existe id o id_producto
+    const productoId = producto.id_producto || producto.id;
     
-    
-    let idProducto;
-    switch (productoActual.tipo_producto) {
-      case 'accesorio':
-        idProducto = producto.id_accesorio;
-        break;
-      case 'bicicleta':
-        idProducto = producto.id_bicicleta;
-        break;
-      case 'producto':
-        idProducto = producto.id_producto;
-        break;
-      default:
-        idProducto = '';
+    if (!producto || !productoId) {
+      console.error('Producto inválido:', producto);
+      return;
     }
-
-   
+  
     setProductoActual({
       ...productoActual,
-      id_producto: idProducto,
-      nombre: producto.nombre,
-      precio_unitario: producto.precio_costo || producto.precio_compra || 0,
-      precio_venta: precioVenta,
-      cantidad: 1, 
+      id_producto: productoId,
+      precio_unitario: Number(producto.precio_costo) || 0,
+      precio_venta: Number(producto.precio_venta) || 0,
+      nombre: producto.nombre || '',
+      codigo: producto.codigo || producto.codigo_barra || '',
       seleccionado: true,
-      codigo: producto.codigo || producto.codigo_barra || ''
+      tipo_producto: productoActual.tipo_producto
     });
-
-    
-    toast.success(`${producto.nombre} seleccionado`);
-
-    
+  
     setBusqueda('');
     setResultadosBusqueda([]);
   };
+  
 
   const agregarDetalle = () => {
     if (!productoActual.seleccionado) {
-      toast.warning('Debe seleccionar un producto');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Producto no seleccionado',
+        text: 'Por favor, seleccione un producto antes de agregarlo',
+        confirmButtonColor: '#3085d6'
+      });
       return;
     }
-
-    if (productoActual.cantidad <= 0) {
-      toast.warning('La cantidad debe ser mayor a 0');
-      return;
-    }
-
-    if (productoActual.precio_unitario <= 0) {
-      toast.warning('El precio de compra debe ser mayor a 0');
-      return;
-    }
-
-    if (productoActual.precio_venta <= 0) {
-      toast.warning('El precio de venta debe ser mayor a 0');
-      return;
-    }
-
+  
     const subtotal = productoActual.cantidad * productoActual.precio_unitario;
-    
-    setCompra(prevCompra => ({
-      ...prevCompra,
-      detalles: [...prevCompra.detalles, {
-        ...productoActual,
-        subtotal
-      }]
-    }));
+  
+    const nuevoDetalle = {
+      tipo_producto: productoActual.tipo_producto,
+      id_producto: productoActual.id_producto,
+      nombre: productoActual.nombre,
+      cantidad: productoActual.cantidad,
+      precio_unitario: productoActual.precio_unitario,
+      precio_venta: productoActual.precio_venta,
+      subtotal
+    };
+  
+    setCompra({
+      ...compra,
+      detalles: [...compra.detalles, nuevoDetalle]
+    });
+  
+    const ultimoTipoSeleccionado = productoActual.tipo_producto;
+    setProductoActual({
+      tipo_producto: ultimoTipoSeleccionado,
+      id_producto: '',
+      cantidad: 1,
+      precio_unitario: 0,
+      precio_venta: 0,
+      nombre: '',
+      seleccionado: false
+    });
+  
+    setBusqueda('');
+    setResultadosBusqueda([]);
+  
+    toast.success('Producto agregado a la compra', {
+      position: "top-right",
+      autoClose: 2000
+    });
+  };
 
-    
+  const eliminarDetalle = (index) => {
+    Swal.fire({
+      title: '¿Eliminar producto?',
+      text: "¿Estás seguro de eliminar este producto de la compra?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const nuevosDetalles = compra.detalles.filter((_, i) => i !== index);
+        setCompra({ ...compra, detalles: nuevosDetalles });
+        toast.success('Producto eliminado de la compra', {
+          position: "top-right",
+          autoClose: 2000
+        });
+      }
+    });
+  };
+
+  const calcularTotal = () => {
+    return compra.detalles.reduce((total, detalle) => total + detalle.subtotal, 0);
+  };
+
+  const guardarCompra = async () => {
+    try {
+      if (!compra.id_proveedor || !compra.tipo_comprobante || !compra.serie || compra.detalles.length === 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Campos incompletos',
+          text: 'Por favor complete todos los campos requeridos',
+          confirmButtonColor: '#3085d6'
+        });
+        return;
+      }
+  
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${URL}/compras`, compra, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (response.data.ok) {
+        const pdfUrl = `${URL}${response.data.compra.pdf}`;
+        window.open(pdfUrl, '_blank');
+        
+        toast.success('Compra registrada exitosamente', {
+          position: "top-right",
+          autoClose: 3000
+        });
+        navigate('/ListaCompra');
+      }
+    } catch (error) {
+      console.error('Error al guardar la compra:', error);
+      alert(error.response?.data?.msg || 'Error al guardar la compra');
+    }
+  };
+  const cancelarCompra = () => {
+    // Resetear el formulario
+    setCompra({
+      id_proveedor: '',
+      tipo_comprobante: 'Factura',
+      serie: '',
+      fecha_facturacion: new Date().toISOString().split('T')[0],
+      detalles: []
+    });
+  
+    // Resetear el producto actual
     setProductoActual({
       tipo_producto: 'accesorio',
       id_producto: '',
@@ -173,152 +282,13 @@ export default function NuevaCompra() {
       nombre: '',
       seleccionado: false
     });
+  
+    // Limpiar búsqueda
     setBusqueda('');
-
-    toast.success('Producto agregado a la compra');
-  };
-
-  const eliminarDetalle = (index) => {
-    Swal.fire({
-      title: '¿Está seguro?',
-      text: "¿Desea eliminar este producto de la compra?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setCompra(prevCompra => ({
-          ...prevCompra,
-          detalles: prevCompra.detalles.filter((_, i) => i !== index)
-        }));
-        toast.success('Producto eliminado de la compra');
-      }
-    });
-  };
-
-  const calcularTotal = () => {
-    return compra.detalles.reduce((total, detalle) => {
-      return total + (Number(detalle.cantidad) * Number(detalle.precio_unitario));
-    }, 0);
-  };
-
-  const guardarCompra = async () => {
-    
-    console.log('Datos de la compra a enviar:', compra);
-    
-    
-    if (!compra.id_proveedor) {
-      toast.warning('Debe seleccionar un proveedor');
-      return;
-    }
-
-    if (!compra.tipo_comprobante || !compra.serie) {
-      toast.warning('Complete los datos del comprobante');
-      return;
-    }
-
-    if (compra.detalles.length === 0) {
-      toast.warning('Agregue al menos un producto a la compra');
-      return;
-    }
-
-    try {
-      const result = await Swal.fire({
-        title: '¿Confirmar compra?',
-        text: `Total a pagar: Q${calcularTotal().toFixed(2)}`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, guardar',
-        cancelButtonText: 'Cancelar'
-      });
-
-      if (result.isConfirmed) {
-        const token = localStorage.getItem('token');
-        
-       
-        const compraFormateada = {
-          ...compra,
-          detalles: compra.detalles.map(detalle => ({
-            tipo_producto: detalle.tipo_producto,
-            id_producto: detalle.id_producto,
-            cantidad: Number(detalle.cantidad),
-            precio_unitario: Number(detalle.precio_unitario),
-            precio_venta: Number(detalle.precio_venta),
-            subtotal: Number(detalle.subtotal)
-          }))
-        };
-
-        console.log('Datos formateados:', compraFormateada);
-
-        const response = await axios.post(`${URL}/compras`, compraFormateada, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (response.data.ok) {
-          toast.success('Compra registrada exitosamente');
-          
-          
-          if (response.data.compra?.pdf) {
-            const pdfUrl = `${URL}${response.data.compra.pdf}`;
-            window.open(pdfUrl, '_blank');
-          }
-          
-          navigate('/ListaCompra');
-        } else {
-          throw new Error(response.data.msg || 'Error al guardar la compra');
-        }
-      }
-    } catch (error) {
-      console.error('Error detallado:', error);
-      toast.error(error.response?.data?.msg || 'Error al guardar la compra');
-    }
-  };
-
-  const cancelarCompra = async () => {
-    const result = await Swal.fire({
-      title: '¿Cancelar compra?',
-      text: "Perderá todos los datos ingresados",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, cancelar',
-      cancelButtonText: 'Volver'
-    });
-
-    if (result.isConfirmed) {
-      setCompra({
-        id_proveedor: '',
-        tipo_comprobante: 'Factura',
-        serie: '',
-        fecha_facturacion: new Date().toISOString().split('T')[0],
-        detalles: []
-      });
-      
-      setProductoActual({
-        tipo_producto: 'accesorio',
-        id_producto: '',
-        cantidad: 1,
-        precio_unitario: 0,
-        precio_venta: 0,
-        nombre: '',
-        seleccionado: false
-      });
-      
-      setBusqueda('');
-      setResultadosBusqueda([]);
-      
-      navigate('/ListaCompra');
-      toast.info('Compra cancelada');
-    }
+    setResultadosBusqueda([]);
+  
+    // Opcional: redirigir a la lista de compras
+    navigate('/ListaCompra');
   };
 
   return (
@@ -437,7 +407,7 @@ export default function NuevaCompra() {
               <ul className={styles.searchResults}>
                 {resultadosBusqueda.map((producto, index) => (
                   <li 
-                    key={`search-${producto.id_producto || producto.id_accesorio || producto.id_bicicleta || index}`}
+                    key={`search-${producto.id_producto || producto.id || index}`}
                     className={styles.searchItem}
                     onClick={() => seleccionarProducto(producto)}
                   >

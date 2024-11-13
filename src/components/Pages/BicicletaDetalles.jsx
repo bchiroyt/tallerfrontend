@@ -47,24 +47,32 @@ function BicicletaDetalles() {
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
+    
     if (name === 'imagen') {
       if (files && files[0]) {
-        setBicicleta({ ...bicicleta, [name]: files[0] });
-        setImagenPreview(URL.createObjectURL(files[0]));
+        try {
+          const imageUrl = window.URL.createObjectURL(files[0]);
+          setImagenPreview(imageUrl);
+          setBicicleta(prev => ({ ...prev, [name]: files[0] }));
+        } catch (error) {
+          console.error('Error al crear URL para la imagen:', error);
+          toast.error('Error al procesar la imagen');
+        }
       }
     } else {
-      setBicicleta({ ...bicicleta, [name]: value });
+      setBicicleta(prev => ({ ...prev, [name]: value }));
     }
   };
 
   const actualizarBicicleta = async () => {
     const formData = new FormData();
+    
     for (const key in bicicleta) {
       if (key === 'imagen') {
         if (bicicleta[key] instanceof File) {
           formData.append(key, bicicleta[key]);
         }
-      } else {
+      } else if (key !== 'nombre_categoria') {
         formData.append(key, bicicleta[key]);
       }
     }
@@ -76,10 +84,19 @@ function BicicletaDetalles() {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-      toast.success('Bicicleta actualizada exitosamente');
-      setEditando(false);
-      setBicicleta(response.data.bicicleta);
-      setImagenPreview(null);
+
+      if (response.data.ok) {
+        const bicicletaActualizada = await axios.get(`${URL}/bicicletas/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        setBicicleta(bicicletaActualizada.data.bicicleta);
+        setEditando(false);
+        setImagenPreview(null);
+        toast.success('Bicicleta actualizada exitosamente');
+      }
     } catch (error) {
       console.error('Error al actualizar la bicicleta:', error);
       toast.error('Error al actualizar la bicicleta');
@@ -111,6 +128,14 @@ function BicicletaDetalles() {
       toast.error('Error al actualizar el estado');
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (imagenPreview) {
+        window.URL.revokeObjectURL(imagenPreview);
+      }
+    };
+  }, [imagenPreview]);
 
   if (!bicicleta) return <div>Cargando...</div>;
 

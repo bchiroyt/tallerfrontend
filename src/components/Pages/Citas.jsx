@@ -4,7 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "../styles/citas.css";
 import actualizarIcon from '../../assets/actualizar1.png';
-import eliminarIcon from '../../assets/eliminar.png';
+import Swal from 'sweetalert2';
 
 function Citas() {
     const [citas, setCitas] = useState([]);
@@ -92,19 +92,32 @@ function Citas() {
         }
     };
 
-    const eliminarCita = async (id) => {
-        if (window.confirm("¿Estás seguro de que quieres eliminar esta cita?")) {
-            try {
-                await axios.delete(`${URL}/citas/${id}`, {
+    const eliminarCita = (id) => {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Esta acción no se puede revertir",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete(`${URL}/citas/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
+                })
+                .then(() => {
+                    setCitas(citas.filter(cita => cita.id_cita !== id));
+                    setCitasFiltradas(citasFiltradas.filter(cita => cita.id_cita !== id));
+                    toast.success("Cita eliminada exitosamente");
+                })
+                .catch((error) => {
+                    console.error("Error al eliminar cita:", error);
+                    toast.error(error.response?.data?.msg || "Error al eliminar la cita");
                 });
-                obtenerCitas();
-                toast.success("Cita eliminada exitosamente");
-            } catch (error) {
-                console.error("Error al eliminar cita:", error);
-                toast.error("No se pudo eliminar la cita. Por favor, intenta más tarde.");
             }
-        }
+        });
     };
 
     const seleccionarCita = (cita) => {
@@ -126,17 +139,20 @@ function Citas() {
     const actualizarCita = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`${URL}/citas/${citaSeleccionada.id_cita}`, nuevaCita, {
+            const response = await axios.put(`${URL}/citas/${citaSeleccionada.id_cita}`, nuevaCita, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            obtenerCitas();
-            resetForm();
-            setModoEditar(false);
-            setMostrarModal(false);
-            toast.success("Cita actualizada exitosamente");
+            
+            if (response.data.ok) {
+                obtenerCitas();
+                resetForm();
+                setModoEditar(false);
+                setMostrarModal(false);
+                toast.success("Cita actualizada exitosamente");
+            }
         } catch (error) {
             console.error("Error al actualizar cita:", error);
-            toast.error("No se pudo actualizar la cita. Por favor, intenta más tarde.");
+            toast.error(error.response?.data?.msg || "No se pudo actualizar la cita. Por favor, intenta más tarde.");
         }
     };
 
@@ -216,12 +232,6 @@ function Citas() {
                                             src={actualizarIcon}
                                             alt="Actualizar"
                                             onClick={() => seleccionarCita(cita)}
-                                            className="accion-icon"
-                                        />
-                                        <img
-                                            src={eliminarIcon}
-                                            alt="Eliminar"
-                                            onClick={() => eliminarCita(cita.id_cita)}
                                             className="accion-icon"
                                         />
                                     </td>

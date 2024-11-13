@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/rolesmodulos.css';
+import Swal from 'sweetalert2';
 
 function RolesModulosPermisos() {
   const [roles, setRoles] = useState([]);
@@ -79,6 +80,11 @@ function RolesModulosPermisos() {
 
   const handleNuevoRol = (e) => {
     e.preventDefault();
+    if (!nuevoRol.nombre.trim()) {
+      toast.error("El nombre del rol es obligatorio");
+      return;
+    }
+
     axios.post(`${URL}/roles`, nuevoRol, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -92,7 +98,7 @@ function RolesModulosPermisos() {
       })
       .catch((error) => {
         console.error("Error al crear rol:", error);
-        toast.error("No se pudo crear el rol. Por favor, intenta más tarde.");
+        toast.error(error.response?.data?.message || "Error al crear el rol");
       });
   };
 
@@ -116,19 +122,37 @@ function RolesModulosPermisos() {
   };
 
   const eliminarRol = (id) => {
-    axios.delete(`${URL}/roles/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(() => {
-        setRoles(roles.filter(rol => rol.id_rol !== id));
-        toast.success("Rol eliminado exitosamente");
-      })
-      .catch((error) => {
-        console.error("Error al eliminar rol:", error);
-        toast.error("No se pudo eliminar el rol. Por favor, intenta más tarde.");
-      });
+    if (id === 1) {
+      toast.error("No se puede eliminar el rol de administrador");
+      return;
+    }
+
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Esta acción no se puede revertir",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.delete(`${URL}/roles/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+          .then(() => {
+            setRoles(roles.filter(rol => rol.id_rol !== id));
+            toast.success("Rol eliminado exitosamente");
+          })
+          .catch((error) => {
+            console.error("Error al eliminar rol:", error);
+            toast.error(error.response?.data?.message || "Error al eliminar el rol");
+          });
+      }
+    });
   };
 
   const eliminarModulo = (id) => {
@@ -148,9 +172,13 @@ function RolesModulosPermisos() {
   };
 
   const seleccionarRol = (rol) => {
-    setRolSeleccionado(rol);
-    fetchPermisos(rol.id_rol);
-    setMostrarModalPermisos(true);
+    if (rol) {
+      setRolSeleccionado(rol);
+      fetchPermisos(rol.id_rol);
+      setMostrarModalPermisos(true);
+    } else {
+      toast.error("Error al seleccionar el rol");
+    }
   };
 
   const togglePermiso = (moduloId) => {
@@ -161,39 +189,62 @@ function RolesModulosPermisos() {
   };
 
   const guardarPermisos = () => {
-    const permisosActuales = permisosRol[rolSeleccionado.id_rol] || {};
-    const permisosAsignar = Object.keys(permisosTemp).filter(moduloId => permisosTemp[moduloId] && !permisosActuales[moduloId]);
-    const permisosDesasignar = Object.keys(permisosTemp).filter(moduloId => !permisosTemp[moduloId] && permisosActuales[moduloId]);
+    Swal.fire({
+      title: '¿Guardar cambios?',
+      text: "¿Deseas guardar los cambios en los permisos?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, guardar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const permisosActuales = permisosRol[rolSeleccionado.id_rol] || {};
+        const permisosAsignar = Object.keys(permisosTemp).filter(moduloId => 
+          permisosTemp[moduloId] && !permisosActuales[moduloId]
+        );
+        const permisosDesasignar = Object.keys(permisosTemp).filter(moduloId => 
+          !permisosTemp[moduloId] && permisosActuales[moduloId]
+        );
 
-    const asignarPromesas = permisosAsignar.map(id_modulo => 
-      axios.post(`${URL}/rolesmodulos/asignar`, { id_rol: rolSeleccionado.id_rol, id_modulo }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-    );
+        const asignarPromesas = permisosAsignar.map(id_modulo => 
+          axios.post(`${URL}/rolesmodulos/asignar`, 
+            { id_rol: rolSeleccionado.id_rol, id_modulo },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
+        );
 
-    const desasignarPromesas = permisosDesasignar.map(id_modulo => 
-      axios.post(`${URL}/rolesmodulos/desasignar`, { id_rol: rolSeleccionado.id_rol, id_modulo }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-    );
+        const desasignarPromesas = permisosDesasignar.map(id_modulo => 
+          axios.post(`${URL}/rolesmodulos/desasignar`, 
+            { id_rol: rolSeleccionado.id_rol, id_modulo },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
+        );
 
-    Promise.all([...asignarPromesas, ...desasignarPromesas])
-      .then(() => {
-        setPermisosRol(prevPermisos => ({
-          ...prevPermisos,
-          [rolSeleccionado.id_rol]: permisosTemp
-        }));
-        setMostrarModalPermisos(false);
-        toast.success("Permisos guardados exitosamente");
-      })
-      .catch((error) => {
-        console.error("Error al guardar permisos:", error);
-        toast.error("No se pudieron guardar los permisos. Por favor, intenta más tarde.");
-      });
+        Promise.all([...asignarPromesas, ...desasignarPromesas])
+          .then(() => {
+            setPermisosRol(prevPermisos => ({
+              ...prevPermisos,
+              [rolSeleccionado.id_rol]: permisosTemp
+            }));
+            setMostrarModalPermisos(false);
+            toast.success("Permisos actualizados exitosamente");
+          })
+          .catch((error) => {
+            console.error("Error al guardar permisos:", error);
+            toast.error("Error al actualizar los permisos");
+          });
+      }
+    });
   };
 
   return (
@@ -221,7 +272,9 @@ function RolesModulosPermisos() {
                 <td>{rol.descripcion}</td>
                 <td>
                   <button onClick={() => seleccionarRol(rol)}>Permisos</button>
-                  <button onClick={() => eliminarRol(rol.id_rol)}>Eliminar</button>
+                  {rol.id_rol !== 1 && (
+                    <button onClick={() => eliminarRol(rol.id_rol)}>Eliminar</button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -231,13 +284,11 @@ function RolesModulosPermisos() {
 
       <div className="section modulos-section">
         <h2>Módulos</h2>
-        <button onClick={() => setMostrarModalModulo(true)} className="crear-btn">Crear Nuevo Módulo</button>
         <table className="data-table">
           <thead>
             <tr>
               <th>ID</th>
               <th>Nombre</th>
-              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -245,9 +296,6 @@ function RolesModulosPermisos() {
               <tr key={modulo.id_modulo}>
                 <td>{modulo.id_modulo}</td>
                 <td>{modulo.nombre}</td>
-                <td>
-                  <button onClick={() => eliminarModulo(modulo.id_modulo)}>Eliminar</button>
-                </td>
               </tr>
             ))}
           </tbody>

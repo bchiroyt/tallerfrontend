@@ -14,6 +14,7 @@ function Categoria() {
     const [nuevaCategoria, setNuevaCategoria] = useState({
         nombre_categoria: "",
         descripcion: "",
+        estado_cat: true,
     });
     const [mostrarModal, setMostrarModal] = useState(false);
     const [modoEditar, setModoEditar] = useState(false);
@@ -124,13 +125,19 @@ function Categoria() {
         setNuevaCategoria({
             nombre_categoria: categoria.nombre_categoria,
             descripcion: categoria.descripcion,
+            estado_cat: true,
         });
         setMostrarModal(true);
     };
 
     const actualizarCategoria = (e) => {
         e.preventDefault();
-        axios.put(`${URL}/categorias/${categoriaSeleccionada.id_categoria}`, nuevaCategoria, {
+        const categoriaActualizada = {
+            ...nuevaCategoria,
+            estado_cat: true,
+        };
+
+        axios.put(`${URL}/categorias/${categoriaSeleccionada.id_categoria}`, categoriaActualizada, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -152,6 +159,7 @@ function Categoria() {
         setNuevaCategoria({
             nombre_categoria: "",
             descripcion: "",
+            estado_cat: true,
         });
         setModoEditar(false);
     };
